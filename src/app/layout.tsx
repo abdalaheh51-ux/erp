@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "Integrated ERP platform with CRM, deals pipeline, invoicing, and payments management.",
   keywords: ["ERP", "CRM", "Invoicing", "Payments", "Next.js"],
   icons: {
-    icon: "/logo.jpg",
+    icon: "/favicon-a.png",
   },
 };
 
