@@ -74,8 +74,8 @@ export function Sidebar() {
         {/* Brand */}
         <div className="flex h-16 items-center justify-between gap-2 border-b border-sidebar-border px-5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-sky-600 text-white shadow-sm">
-              <img src="/logo.svg" alt="Nexus ERP" className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden border border-border bg-black shadow-sm">
+              <img src="/logo.jpg" alt="Nexus ERP" className="h-full w-full object-cover" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold leading-tight text-sidebar-foreground">
