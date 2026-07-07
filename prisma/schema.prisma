@@ -1,0 +1,101 @@
+// ERP System - CRM + Invoicing Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  status    String   @default("new") // new | lead | active | inactive
+  source    String?  // website | social_media | referral | ads | other
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deals        Deal[]
+  interactions Interaction[]
+  invoices     Invoice[]
+}
+
+model Deal {
+  id         String   @id @default(cuid())
+  title      String
+  value      Float    @default(0)
+  stage      String   @default("contact") // contact | proposal | negotiation | won | lost
+  customerId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoices Invoice[]
+}
+
+model Interaction {
+  id         String   @id @default(cuid())
+  content    String
+  date       DateTime @default(now())
+  customerId String
+  type       String   @default("note") // note | call | meeting | email
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float    @default(0)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  invoiceItems InvoiceItem[]
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  number      String    @unique
+  totalAmount Float     @default(0)
+  status      String    @default("draft") // draft | pending | paid | overdue
+  dueDate     DateTime?
+  customerId  String
+  dealId      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  customer Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  deal     Deal?          @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  items    InvoiceItem[]
+  payments Payment[]
+}
+
+model InvoiceItem {
+  id        String @id @default(cuid())
+  invoiceId String
+  productId String
+  quantity  Int    @default(1)
+  unitPrice Float  @default(0)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  invoiceId     String
+  amount        Float    @default(0)
+  paymentMethod String   @default("cash") // cash | bank_transfer | payment_gateway
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
