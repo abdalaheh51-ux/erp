@@ -65,8 +65,8 @@ export function Header() {
           </Button>
         )}
 
-        <div className="ml-1 flex h-9 w-9 items-center justify-center rounded-full overflow-hidden border border-border bg-black shadow-sm">
-          <img src="/logo.jpg" alt="Nexus ERP" className="h-full w-full object-cover" />
+        <div className="ml-1 flex h-9 w-9 items-center justify-center">
+          <img src="/favicon-a.png" alt="Nexus ERP" className="h-7 w-7 object-contain" />
         </div>
       </div>
     </header>
