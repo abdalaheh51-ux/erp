@@ -65,8 +65,8 @@ export function Header() {
           </Button>
         )}
 
-        <div className="ml-1 flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-sky-600 text-sm font-semibold text-white">
-          AD
+        <div className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-sky-600 text-white shadow-sm">
+          <img src="/logo.svg" alt="Nexus ERP" className="h-5 w-5" />
         </div>
       </div>
     </header>
