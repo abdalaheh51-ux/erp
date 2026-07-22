@@ -320,7 +320,6 @@ function PaymentFormDialog({
                       (s, p) => s + p.amount,
                       0,
                     ),
-                    ,
                     language,
                   )}
                 </p>

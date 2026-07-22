@@ -45,7 +45,6 @@ import {
   InteractionTypeBadge,
   PaymentMethodBadge,
 } from "@/components/erp/badges";
-import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 
 interface DashboardData {
