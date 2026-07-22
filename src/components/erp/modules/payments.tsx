@@ -223,16 +223,16 @@ function PaymentFormDialog({
 
   const handleSubmit = () => {
     if (mode === "create" && !invoiceId) {
-      setError("Please select an invoice.");
+      setError(t("please_select_invoice", language));
       return;
     }
     const amt = Number(amount);
     if (!amt || amt <= 0 || isNaN(amt)) {
-      setError("Please enter a valid amount greater than zero.");
+      setError(t("please_enter_valid_amount", language));
       return;
     }
     if (!date) {
-      setError("Please select a payment date.");
+      setError(t("please_select_payment_date", language));
       return;
     }
     onSubmit({
@@ -248,12 +248,12 @@ function PaymentFormDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {mode === "edit" ? "Edit Payment" : "Record Payment"}
+            {mode === "edit" ? t("edit_payment", language) : t("record_payment", language)}
           </DialogTitle>
           <DialogDescription>
             {mode === "edit"
-              ? "Update the payment details below."
-              : "Record a new payment against an invoice."}
+              ? t("edit_payment_description", language)
+              : t("record_payment_description", language)}
           </DialogDescription>
         </DialogHeader>
 
@@ -261,7 +261,7 @@ function PaymentFormDialog({
           {/* Invoice selector / display */}
           <div className="space-y-1.5">
             <Label>
-              Invoice <span className="text-rose-500">*</span>
+              {t("invoice_label", language)} <span className="text-rose-500">*</span>
             </Label>
             {mode === "edit" ? (
               <div className="flex h-9 items-center rounded-md border border-border bg-muted/40 px-3 text-sm">
@@ -348,7 +348,7 @@ function PaymentFormDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Method</Label>
+            <Label>{t("method_label", language)}</Label>
             <Select
               value={method}
               onValueChange={(v) => setMethod(v as PaymentMethod)}
@@ -367,7 +367,7 @@ function PaymentFormDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Date</Label>
+            <Label>{t("date_label", language)}</Label>
             <Input
               type="date"
               value={date}
@@ -409,6 +409,7 @@ export function PaymentsModule() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { openCustomerDetail, setModule } = useUIStore();
+  const language = useUIStore.getState().language;
 
   const [search, setSearch] = useState("");
   const [methodFilter, setMethodFilter] = useState<string>("all");
