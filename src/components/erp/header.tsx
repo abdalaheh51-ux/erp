@@ -1,25 +1,26 @@
 "use client";
 
-import { Menu, Moon, Sun, Bell, Search } from "lucide-react";
+import { Menu, Moon, Sun, Bell, Search, Globe } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUIStore } from "@/store/ui-store";
+import { t } from "@/lib/translations";
 
 export function Header() {
-  const { setSidebarOpen, activeModule } = useUIStore();
+  const { setSidebarOpen, activeModule, language, setLanguage } = useUIStore();
   const { theme, setTheme } = useTheme();
-  const [mounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const titles: Record<string, string> = {
-    dashboard: "Dashboard",
-    customers: "Customers",
-    deals: "Deals",
-    interactions: "Interactions",
-    products: "Products",
-    invoices: "Invoices",
-    payments: "Payments",
+    dashboard: t("dashboard", language),
+    customers: t("customers", language),
+    deals: t("deals", language),
+    interactions: t("interactions", language),
+    products: t("products", language),
+    invoices: t("invoices", language),
+    payments: t("payments", language),
   };
 
   return (
@@ -49,6 +50,18 @@ export function Header() {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="size-5" />
           <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-rose-500 ring-2 ring-background" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setLanguage(language === "en" ? "ar" : "en")}
+          title={language === "en" ? "عربي" : "English"}
+        >
+          <Globe className="size-5" />
+          <span className="ml-0.5 text-xs font-semibold">
+            {language.toUpperCase()}
+          </span>
         </Button>
 
         {mounted && (

@@ -14,6 +14,7 @@ import {
 import { useUIStore, type ModuleKey } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { t } from "@/lib/translations";
 
 interface NavItem {
   key: ModuleKey;
@@ -23,16 +24,19 @@ interface NavItem {
 
 interface NavGroup {
   label: string;
+  label_ar: string;
   items: NavItem[];
 }
 
 const NAV_GROUPS: NavGroup[] = [
   {
     label: "Overview",
+    label_ar: "نظرة عامة",
     items: [{ key: "dashboard", label: "Dashboard", icon: LayoutDashboard }],
   },
   {
     label: "CRM",
+    label_ar: "إدارة العلاقات",
     items: [
       { key: "customers", label: "Customers", icon: Users },
       { key: "deals", label: "Deals", icon: Handshake },
@@ -41,6 +45,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: "Billing",
+    label_ar: "الفواتير والدفعات",
     items: [
       { key: "invoices", label: "Invoices", icon: FileText },
       { key: "payments", label: "Payments", icon: Wallet },
@@ -48,12 +53,13 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: "Catalog",
+    label_ar: "الكتالوج",
     items: [{ key: "products", label: "Products", icon: Package }],
   },
 ];
 
 export function Sidebar() {
-  const { activeModule, setModule, sidebarOpen, setSidebarOpen } = useUIStore();
+  const { activeModule, setModule, sidebarOpen, setSidebarOpen, language } = useUIStore();
 
   return (
     <>
@@ -101,7 +107,7 @@ export function Sidebar() {
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
               <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {group.label}
+                {language === "ar" ? group.label_ar : group.label}
               </p>
               <div className="space-y-0.5">
                 {group.items.map((item) => {
@@ -119,7 +125,7 @@ export function Sidebar() {
                       )}
                     >
                       <Icon className="size-4 shrink-0" />
-                      <span>{item.label}</span>
+                      <span>{t(item.key, language)}</span>
                     </button>
                   );
                 })}

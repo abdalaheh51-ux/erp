@@ -122,4 +122,13 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  html.rtl {
+    direction: rtl;
+    text-align: right;
+  }
+  
+  html.rtl body {
+    text-align: right;
+  }
 }
