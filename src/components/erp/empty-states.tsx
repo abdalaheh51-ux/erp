@@ -27,12 +27,17 @@ export function EmptyState({
   );
 }
 
-export function LoadingState({ label = "Loading..." }: { label?: string }) {
+import { useUIStore } from "@/store/ui-store";
+import { t } from "@/lib/translations";
+
+export function LoadingState({ label }: { label?: string }) {
+  const language = useUIStore((s) => s.language);
+  const lbl = label ?? t("loading", language);
   return (
     <div className="flex items-center justify-center py-16">
       <div className="flex flex-col items-center gap-3">
         <div className="size-7 animate-spin rounded-full border-2 border-muted border-t-foreground" />
-        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-sm text-muted-foreground">{lbl}</p>
       </div>
     </div>
   );

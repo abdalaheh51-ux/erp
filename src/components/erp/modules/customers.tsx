@@ -39,6 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { t } from "@/lib/translations";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -238,15 +239,15 @@ export function CustomersModule() {
       qc.invalidateQueries({ queryKey: ["customers"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Customer created",
-        description: "The customer has been added to your CRM.",
+        title: t("toast_customer_created_title", useUIStore.getState().language),
+        description: t("toast_customer_created_desc", useUIStore.getState().language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: "Something went wrong",
-        description: "Could not create the customer. Please try again.",
+        title: t("error_something_wrong", useUIStore.getState().language),
+        description: t("error_try_again", useUIStore.getState().language),
         variant: "destructive",
       });
     },
@@ -279,15 +280,15 @@ export function CustomersModule() {
       qc.invalidateQueries({ queryKey: ["customer", activeCustomerId] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Customer updated",
-        description: "Your changes have been saved.",
+        title: t("toast_customer_updated_title", useUIStore.getState().language),
+        description: t("toast_customer_updated_desc", useUIStore.getState().language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: "Something went wrong",
-        description: "Could not update the customer. Please try again.",
+        title: t("error_something_wrong", useUIStore.getState().language),
+        description: t("error_try_again", useUIStore.getState().language),
         variant: "destructive",
       });
     },
@@ -303,15 +304,15 @@ export function CustomersModule() {
       qc.invalidateQueries({ queryKey: ["customers"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Customer deleted",
-        description: "The customer and their related records were removed.",
+        title: t("toast_customer_deleted_title", useUIStore.getState().language),
+        description: t("toast_customer_deleted_desc", useUIStore.getState().language),
       });
       setDeleteTarget(null);
     },
     onError: () => {
       toast({
-        title: "Something went wrong",
-        description: "Could not delete the customer. Please try again.",
+        title: t("error_something_wrong", useUIStore.getState().language),
+        description: t("error_try_again", useUIStore.getState().language),
         variant: "destructive",
       });
     },
@@ -339,7 +340,7 @@ export function CustomersModule() {
 
   function validate(): boolean {
     const err: { name?: string } = {};
-    if (!form.name.trim()) err.name = "Name is required";
+    if (!form.name.trim()) err.name = t("validation_name_required", useUIStore.getState().language);
     setFormError(err);
     return Object.keys(err).length === 0;
   }
@@ -370,15 +371,15 @@ export function CustomersModule() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Customers"
-        description="Manage your customer relationships, leads, and contact information."
+        title={t("customers", useUIStore.getState().language)}
+        description={t("manage_customers_desc", useUIStore.getState().language)}
         action={
           <Button
             onClick={openCreate}
             className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
           >
             <Plus className="size-4" />
-            New Customer
+            {t("new_customer", useUIStore.getState().language)}
           </Button>
         }
       />
@@ -390,20 +391,20 @@ export function CustomersModule() {
           <Input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search by name, email or phone..."
+            placeholder={t("search_customers_placeholder", useUIStore.getState().language)}
             className="pl-9"
             aria-label="Search customers"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger
-            className="w-full sm:w-[180px]"
-            aria-label="Filter by status"
-          >
-            <SelectValue placeholder="All statuses" />
-          </SelectTrigger>
+            <SelectTrigger
+              className="w-full sm:w-[180px]"
+              aria-label="Filter by status"
+            >
+              <SelectValue placeholder={t("all_statuses", useUIStore.getState().language)} />
+            </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="all">{t("all_statuses", useUIStore.getState().language)}</SelectItem>
             {STATUS_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>
                 {CUSTOMER_STATUS[s].label}
@@ -415,15 +416,19 @@ export function CustomersModule() {
 
       {/* Table / states */}
       {isLoading ? (
-        <LoadingState label="Loading customers..." />
+        <LoadingState label={t("loading", useUIStore.getState().language)} />
       ) : customers.length === 0 ? (
         <EmptyState
           icon={Users}
-          title={search || statusFilter !== "all" ? "No customers found" : "No customers yet"}
+          title={
+            search || statusFilter !== "all"
+              ? t("no_customers_found", useUIStore.getState().language)
+              : t("no_customers_yet", useUIStore.getState().language)
+          }
           description={
             search || statusFilter !== "all"
-              ? "Try adjusting your search or filters to find what you're looking for."
-              : "Add your first customer to start managing relationships and deals."
+              ? t("no_customers_found_desc", useUIStore.getState().language)
+              : t("no_customers_yet_desc", useUIStore.getState().language)
           }
           action={
             search || statusFilter !== "all" ? (
@@ -434,7 +439,7 @@ export function CustomersModule() {
                   setStatusFilter("all");
                 }}
               >
-                Clear filters
+                {t("clear_filters", useUIStore.getState().language)}
               </Button>
             ) : (
               <Button
@@ -442,7 +447,7 @@ export function CustomersModule() {
                 className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
               >
                 <Plus className="size-4" />
-                Add Customer
+                {t("add_customer", useUIStore.getState().language)}
               </Button>
             )
           }
@@ -451,17 +456,15 @@ export function CustomersModule() {
         <Card className="overflow-hidden p-0">
           <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">
-                {customers.length}
-              </span>{" "}
-              {customers.length === 1 ? "customer" : "customers"}
+              <span className="font-medium text-foreground">{customers.length}</span>{" "}
+              {customers.length === 1
+                ? t("customer_singular", useUIStore.getState().language)
+                : t("customer_plural", useUIStore.getState().language)}
               {totalDeals > 0 && (
                 <>
                   {" · "}
-                  <span className="font-medium text-foreground">
-                    {totalDeals}
-                  </span>{" "}
-                  open {totalDeals === 1 ? "deal" : "deals"}
+                  <span className="font-medium text-foreground">{totalDeals}</span>{" "}
+                  {t("open_deals", useUIStore.getState().language)} {totalDeals === 1 ? t("deal_singular", useUIStore.getState().language) : t("deal_plural", useUIStore.getState().language)}
                 </>
               )}
             </p>
@@ -470,12 +473,12 @@ export function CustomersModule() {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-card after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-border">
                 <TableRow className="border-b hover:bg-transparent">
-                  <TableHead className="pl-4">Customer</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead className="text-center">Deals</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead className="pl-4">{t("table_customer", useUIStore.getState().language)}</TableHead>
+                  <TableHead>{t("table_contact", useUIStore.getState().language)}</TableHead>
+                  <TableHead>{t("table_status", useUIStore.getState().language)}</TableHead>
+                  <TableHead>{t("table_source", useUIStore.getState().language)}</TableHead>
+                  <TableHead className="text-center">{t("table_deals", useUIStore.getState().language)}</TableHead>
+                  <TableHead>{t("table_created", useUIStore.getState().language)}</TableHead>
                   <TableHead className="w-12 pr-4 text-right" />
                 </TableRow>
               </TableHeader>

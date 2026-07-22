@@ -8,8 +8,11 @@ import {
   INTERACTION_TYPE,
   PAYMENT_METHOD,
 } from "@/lib/erp-constants";
+import { useUIStore } from "@/store/ui-store";
+import { t } from "@/lib/translations";
 
 export function CustomerStatusBadge({ status }: { status: string }) {
+  const language = useUIStore((s) => s.language);
   const cfg = CUSTOMER_STATUS[status as keyof typeof CUSTOMER_STATUS];
   if (!cfg) return <Badge variant="outline">{status}</Badge>;
   return (
@@ -17,53 +20,57 @@ export function CustomerStatusBadge({ status }: { status: string }) {
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.color}`}
     >
       <span className={`size-1.5 rounded-full ${cfg.dot}`} />
-      {cfg.label}
+      {t(`status.${status}`, language)}
     </span>
   );
 }
 
 export function DealStageBadge({ stage }: { stage: string }) {
+  const language = useUIStore((s) => s.language);
   const cfg = DEAL_STAGE[stage as keyof typeof DEAL_STAGE];
   if (!cfg) return <Badge variant="outline">{stage}</Badge>;
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.color}`}
     >
-      {cfg.label}
+      {t(`stage.${stage}`, language)}
     </span>
   );
 }
 
 export function InvoiceStatusBadge({ status }: { status: string }) {
+  const language = useUIStore((s) => s.language);
   const cfg = INVOICE_STATUS[status as keyof typeof INVOICE_STATUS];
   if (!cfg) return <Badge variant="outline">{status}</Badge>;
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.color}`}
     >
-      {cfg.label}
+      {t(`invoice.${status}`, language)}
     </span>
   );
 }
 
 export function InteractionTypeBadge({ type }: { type: string }) {
+  const language = useUIStore((s) => s.language);
   const cfg = INTERACTION_TYPE[type as keyof typeof INTERACTION_TYPE];
   if (!cfg) return <Badge variant="outline">{type}</Badge>;
   return (
     <span
       className={`inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium ${cfg.color} dark:bg-zinc-500/15`}
     >
-      {cfg.label}
+      {t(`interaction.${type}`, language)}
     </span>
   );
 }
 
 export function PaymentMethodBadge({ method }: { method: string }) {
+  const language = useUIStore((s) => s.language);
   const cfg = PAYMENT_METHOD[method as keyof typeof PAYMENT_METHOD];
   if (!cfg) return <Badge variant="outline">{method}</Badge>;
   return (
     <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-500/15 dark:text-zinc-300">
-      {cfg.label}
+      {t(`payment.${method}`, language)}
     </span>
   );
 }

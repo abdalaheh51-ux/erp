@@ -53,42 +53,50 @@ export type InvoiceStatus = keyof typeof INVOICE_STATUS;
 export type PaymentMethod = keyof typeof PAYMENT_METHOD;
 
 export const CURRENCY = "EGP";
+export function getLocaleFromLang(lang?: string) {
+  const l = lang || (typeof document !== "undefined" ? document.documentElement.lang : "en");
+  return l === "ar" ? "ar-EG" : "en-US";
+}
 
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
+export function formatCurrency(amount: number, lang?: string): string {
+  const locale = getLocaleFromLang(lang);
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: CURRENCY,
     maximumFractionDigits: 0,
   }).format(amount || 0);
 }
 
-export function formatNumber(n: number): string {
-  return new Intl.NumberFormat("en-US").format(n || 0);
+export function formatNumber(n: number, lang?: string): string {
+  const locale = getLocaleFromLang(lang);
+  return new Intl.NumberFormat(locale).format(n || 0);
 }
 
-export function formatDate(date: Date | string | null | undefined): string {
+export function formatDate(date: Date | string | null | undefined, lang?: string): string {
   if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  const locale = getLocaleFromLang(lang);
+  return d.toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" });
 }
 
-export function formatDateTime(date: Date | string | null | undefined): string {
+export function formatDateTime(date: Date | string | null | undefined, lang?: string): string {
   if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  const locale = getLocaleFromLang(lang);
+  return d.toLocaleDateString(locale, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-export function timeAgo(date: Date | string): string {
+export function timeAgo(date: Date | string, lang?: string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (seconds < 60) return "just now";
+  if (seconds < 60) return lang === "ar" ? "الآن" : "just now";
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return `${minutes}${lang === "ar" ? "د" : "m"}` + (lang === "ar" ? "" : " ago");
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return `${hours}${lang === "ar" ? "س" : "h"}` + (lang === "ar" ? "" : " ago");
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return formatDate(d);
+  if (days < 30) return `${days}${lang === "ar" ? "ي" : "d"}` + (lang === "ar" ? "" : " ago");
+  return formatDate(d, lang);
 }
 
 // Generate next invoice number: INV-0001
