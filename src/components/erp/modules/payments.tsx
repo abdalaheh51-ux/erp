@@ -54,6 +54,7 @@ import { PaymentMethodBadge } from "@/components/erp/badges";
 import { ConfirmDialog } from "@/components/erp/confirm-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useUIStore } from "@/store/ui-store";
+import { t } from "@/lib/translations";
 import {
   PAYMENT_METHOD,
   formatCurrency,
@@ -179,6 +180,7 @@ function PaymentFormDialog({
   onSubmit: (data: PaymentFormPayload) => void;
   submitting: boolean;
 }) {
+  const language = useUIStore.getState().language;
   // Lazy initial state — parent remounts this dialog via `key` whenever it
   // is opened, so these initializers run fresh each time.
   const [invoiceId, setInvoiceId] = useState<string>(
@@ -273,12 +275,12 @@ function PaymentFormDialog({
             ) : (
               <Select value={invoiceId} onValueChange={handleInvoiceChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select an invoice" />
+                  <SelectValue placeholder={t("select_invoice", language)} />
                 </SelectTrigger>
                 <SelectContent>
                   {invoices.length === 0 ? (
                     <SelectItem value="__none" disabled>
-                      No invoices available
+                      {t("no_invoices_available", language)}
                     </SelectItem>
                   ) : (
                     invoices.map((inv) => {
@@ -290,7 +292,7 @@ function PaymentFormDialog({
                             {" · "}
                             {inv.customer.name}
                             {" · "}
-                            Bal: {formatCurrency(bal)}
+                            {t("balance_prefix", language)} {formatCurrency(bal, language)}
                           </span>
                         </SelectItem>
                       );
@@ -305,26 +307,28 @@ function PaymentFormDialog({
           {mode === "create" && selectedInvoice && (
             <div className="grid grid-cols-3 gap-2 rounded-lg border border-border/60 p-3 text-center">
               <div>
-                <p className="text-xs text-muted-foreground">Total</p>
+                <p className="text-xs text-muted-foreground">{t("total_label", language)}</p>
                 <p className="text-sm font-medium text-foreground">
-                  {formatCurrency(selectedInvoice.totalAmount)}
+                  {formatCurrency(selectedInvoice.totalAmount, language)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Paid</p>
+                <p className="text-xs text-muted-foreground">{t("paid_label", language)}</p>
                 <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(
                     (selectedInvoice.payments || []).reduce(
                       (s, p) => s + p.amount,
                       0,
                     ),
+                    ,
+                    language,
                   )}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Balance</p>
+                <p className="text-xs text-muted-foreground">{t("balance_due_label", language)}</p>
                 <p className="text-sm font-semibold text-amber-600 dark:text-amber-400">
-                  {formatCurrency(invoiceBalance(selectedInvoice))}
+                  {formatCurrency(invoiceBalance(selectedInvoice), language)}
                 </p>
               </div>
             </div>
@@ -332,7 +336,7 @@ function PaymentFormDialog({
 
           <div className="space-y-1.5">
             <Label>
-              Amount <span className="text-rose-500">*</span>
+              {t("amount", language)} <span className="text-rose-500">*</span>
             </Label>
             <Input
               type="number"
@@ -381,7 +385,7 @@ function PaymentFormDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("cancel", language)}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -389,10 +393,10 @@ function PaymentFormDialog({
             className="bg-blue-600 text-white hover:bg-blue-700"
           >
             {submitting
-              ? "Saving..."
+              ? t("saving", language)
               : mode === "edit"
-                ? "Save Changes"
-                : "Record Payment"}
+                ? t("save_changes", language)
+                : t("record_payment", language)}
           </Button>
         </DialogFooter>
       </DialogContent>
