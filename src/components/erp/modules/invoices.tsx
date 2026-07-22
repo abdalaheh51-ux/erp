@@ -435,8 +435,8 @@ function RecordPaymentDialog({
   });
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const [date, setDate] = useState<string>(() => toDateInputValue(new Date()));
-  const [error, setError] = useState("");
-
+    const [error, setError] = useState("");
+  const language = useUIStore.getState().language;
   const paid = sumPaid(invoice?.payments);
   const balance = calculateInvoiceBalance(invoice?.totalAmount || 0, invoice?.payments || []);
 
@@ -606,6 +606,7 @@ function InvoiceFormDialog({
     return [{ key: crypto.randomUUID(), productId: "", quantity: 1, unitPrice: 0 }];
   });
   const [error, setError] = useState<string>("");
+  const language = useUIStore.getState().language;
 
   const customerDeals = useMemo(
     () => deals.filter((d) => d.customerId === customerId),
