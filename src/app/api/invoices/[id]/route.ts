@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { deriveInvoiceStatus } from "@/lib/invoice-math";
 
 export const dynamic = "force-dynamic";
 
@@ -64,15 +65,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     },
   });
 
-  // Auto-update invoice status to paid if payments cover total
+  // Auto-update invoice status based on payments and due date
   if (body.recomputeStatus) {
-    const payments = await db.payment.aggregate({
-      where: { invoiceId: id },
-      _sum: { amount: true },
-    });
-    const paid = payments._sum.amount || 0;
-    if (paid >= invoice.totalAmount && invoice.totalAmount > 0) {
-      await db.invoice.update({ where: { id }, data: { status: "paid" } });
+    const payments = await db.payment.findMany({ where: { invoiceId: id }, select: { amount: true } });
+    const nextStatus = deriveInvoiceStatus(invoice.totalAmount, payments, invoice.dueDate, invoice.status);
+    if (nextStatus !== invoice.status) {
+      await db.invoice.update({ where: { id }, data: { status: nextStatus } });
     }
   }
 

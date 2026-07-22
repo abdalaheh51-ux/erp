@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { DEAL_STAGE_ORDER } from "@/lib/erp-constants";
+import { deriveInvoiceStatus } from "@/lib/invoice-math";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,6 @@ export async function GET() {
     customersNewThisMonth,
     customersNewLastMonth,
     openDealsCount,
-    overdueCount,
   ] = await Promise.all([
     db.customer.count(),
     db.deal.count(),
@@ -51,14 +51,25 @@ export async function GET() {
       where: { createdAt: { gte: lastMonthStart, lte: lastMonthEnd } },
     }),
     db.deal.count({ where: { stage: { notIn: ["won", "lost"] } } }),
-    db.invoice.count({ where: { status: "overdue" } }),
   ]);
 
   const totalRevenue = await db.payment.aggregate({ _sum: { amount: true } });
-  const totalOutstanding = await db.invoice.aggregate({
-    where: { status: { in: ["pending", "overdue"] } },
-    _sum: { totalAmount: true },
+  const allInvoices = await db.invoice.findMany({
+    include: { payments: true },
   });
+  const derivedInvoiceStatuses = allInvoices.map((invoice) => {
+    const paid = invoice.payments.reduce((s, p) => s + p.amount, 0);
+    return {
+      id: invoice.id,
+      status: deriveInvoiceStatus(invoice.totalAmount, invoice.payments, invoice.dueDate, invoice.status),
+      balance: Math.max(0, invoice.totalAmount - paid),
+      totalAmount: invoice.totalAmount,
+    };
+  });
+  const totalOutstanding = derivedInvoiceStatuses
+    .filter((invoice) => invoice.status === "pending" || invoice.status === "overdue")
+    .reduce((sum, invoice) => sum + invoice.balance, 0);
+  const overdueCount = derivedInvoiceStatuses.filter((invoice) => invoice.status === "overdue").length;
   const totalDealsValue = await db.deal.aggregate({
     where: { stage: { notIn: ["won", "lost"] } },
     _sum: { value: true },
@@ -84,12 +95,15 @@ export async function GET() {
     count: customersByStatus.find((c) => c.status === s)?._count || 0,
   }));
 
-  // Invoice status distribution
-  const invoiceStatusDist = (["draft", "pending", "paid", "overdue"] as const).map((s) => ({
-    status: s,
-    count: invoicesByStatus.find((i) => i.status === s)?._count || 0,
-    amount: invoicesByStatus.find((i) => i.status === s)?._sum.totalAmount || 0,
-  }));
+  // Invoice status distribution derived from payments and due dates
+  const invoiceStatusDist = (["draft", "pending", "paid", "overdue"] as const).map((s) => {
+    const matching = derivedInvoiceStatuses.filter((invoice) => invoice.status === s);
+    return {
+      status: s,
+      count: matching.length,
+      amount: matching.reduce((sum, invoice) => sum + invoice.totalAmount, 0),
+    };
+  });
 
   // Revenue last 6 months
   const months: Array<{ label: string; revenue: number; key: string }> = [];
@@ -105,6 +119,14 @@ export async function GET() {
     const m = months.find((mm) => mm.key === key);
     if (m) m.revenue += p.amount;
   }
+
+  const invoiceAmountsByStatus = derivedInvoiceStatuses.reduce<Record<string, number>>((acc, invoice) => {
+    acc[invoice.status] = (acc[invoice.status] || 0) + invoice.totalAmount;
+    return acc;
+  }, {});
+  invoiceStatusDist.forEach((entry) => {
+    entry.amount = invoiceAmountsByStatus[entry.status] || 0;
+  });
 
   // Recent activity
   const recentInteractions = await db.interaction.findMany({
@@ -128,7 +150,7 @@ export async function GET() {
     counts: { customers, deals, invoices, payments, interactions, products },
     revenue: {
       total: totalRevenue._sum.amount || 0,
-      outstanding: totalOutstanding._sum.totalAmount || 0,
+      outstanding: totalOutstanding,
       pipeline: totalDealsValue._sum.value || 0,
       won: wonDealsValue._sum.value || 0,
     },

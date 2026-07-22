@@ -60,6 +60,7 @@ import {
   formatDate,
   type PaymentMethod,
 } from "@/lib/erp-constants";
+import { calculateInvoiceBalance } from "@/lib/invoice-math";
 import { cn } from "@/lib/utils";
 
 /* ----------------------------- Types ----------------------------- */
@@ -111,11 +112,7 @@ function toDateInputValue(date: string | Date | null | undefined): string {
 }
 
 function invoiceBalance(inv: Invoice): number {
-  const paid = (inv.payments || []).reduce(
-    (s, p) => s + (p.amount || 0),
-    0,
-  );
-  return Math.max(0, inv.totalAmount - paid);
+  return calculateInvoiceBalance(inv.totalAmount, inv.payments || []);
 }
 
 function isSameMonth(dateStr: string, ref: Date): boolean {

@@ -75,6 +75,7 @@ import {
   type InvoiceStatus,
   type PaymentMethod,
 } from "@/lib/erp-constants";
+import { calculateInvoiceBalance, deriveInvoiceStatus } from "@/lib/invoice-math";
 import { cn } from "@/lib/utils";
 
 /* ----------------------------- Types ----------------------------- */
@@ -211,7 +212,7 @@ function InvoiceDetailSheet({
 }) {
   const paid = sumPaid(invoice?.payments);
   const total = invoice?.totalAmount || 0;
-  const balance = total - paid;
+  const balance = calculateInvoiceBalance(total, invoice?.payments || []);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -427,7 +428,7 @@ function RecordPaymentDialog({
   const [amount, setAmount] = useState<string>(() => {
     if (!invoice) return "";
     const paid = sumPaid(invoice.payments);
-    const bal = Math.max(0, invoice.totalAmount - paid);
+    const bal = calculateInvoiceBalance(invoice.totalAmount, invoice.payments);
     return String(bal || "");
   });
   const [method, setMethod] = useState<PaymentMethod>("cash");
@@ -435,7 +436,7 @@ function RecordPaymentDialog({
   const [error, setError] = useState("");
 
   const paid = sumPaid(invoice?.payments);
-  const balance = (invoice?.totalAmount || 0) - paid;
+  const balance = calculateInvoiceBalance(invoice?.totalAmount || 0, invoice?.payments || []);
 
   const handleSubmit = () => {
     if (!invoice) return;
@@ -1157,13 +1158,22 @@ export function InvoicesModule() {
   const stats = useMemo(() => {
     const all = invoices || [];
     const totalBilled = all.reduce((s, i) => s + i.totalAmount, 0);
-    const paid = all
-      .filter((i) => i.status === "paid")
+    const derived = all.map((invoice) => ({
+      ...invoice,
+      runtimeStatus: deriveInvoiceStatus(
+        invoice.totalAmount,
+        invoice.payments,
+        invoice.dueDate ? new Date(invoice.dueDate) : null,
+        invoice.status,
+      ),
+    }));
+    const paid = derived
+      .filter((i) => i.runtimeStatus === "paid")
       .reduce((s, i) => s + i.totalAmount, 0);
-    const outstanding = all
-      .filter((i) => i.status === "pending" || i.status === "overdue")
-      .reduce((s, i) => s + Math.max(0, i.totalAmount - sumPaid(i.payments)), 0);
-    const overdueCount = all.filter((i) => i.status === "overdue").length;
+    const outstanding = derived
+      .filter((i) => i.runtimeStatus === "pending" || i.runtimeStatus === "overdue")
+      .reduce((s, i) => s + calculateInvoiceBalance(i.totalAmount, i.payments), 0);
+    const overdueCount = derived.filter((i) => i.runtimeStatus === "overdue").length;
     return { totalBilled, paid, outstanding, overdueCount };
   }, [invoices]);
 

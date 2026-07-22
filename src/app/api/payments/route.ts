@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { deriveInvoiceStatus } from "@/lib/invoice-math";
 
 export const dynamic = "force-dynamic";
 
@@ -30,17 +31,20 @@ export async function POST(req: NextRequest) {
     include: { invoice: { include: { customer: true } } },
   });
 
-  // Auto-update invoice status to paid if total covered
+  // Auto-update invoice status based on payments and due date
   const invoice = await db.invoice.findUnique({
     where: { id: body.invoiceId },
     include: { payments: true },
   });
   if (invoice) {
-    const paid = invoice.payments.reduce((s, p) => s + p.amount, 0);
-    if (paid >= invoice.totalAmount && invoice.totalAmount > 0) {
-      await db.invoice.update({ where: { id: invoice.id }, data: { status: "paid" } });
-    } else if (paid > 0) {
-      await db.invoice.update({ where: { id: invoice.id }, data: { status: "pending" } });
+    const nextStatus = deriveInvoiceStatus(
+      invoice.totalAmount,
+      invoice.payments,
+      invoice.dueDate,
+      invoice.status,
+    );
+    if (nextStatus !== invoice.status) {
+      await db.invoice.update({ where: { id: invoice.id }, data: { status: nextStatus } });
     }
   }
 
