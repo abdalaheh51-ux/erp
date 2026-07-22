@@ -67,6 +67,7 @@ import { InvoiceStatusBadge, PaymentMethodBadge } from "@/components/erp/badges"
 import { ConfirmDialog } from "@/components/erp/confirm-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useUIStore } from "@/store/ui-store";
+import { t } from "@/lib/translations";
 import {
   INVOICE_STATUS,
   PAYMENT_METHOD,
@@ -210,6 +211,7 @@ function InvoiceDetailSheet({
   onRecordPayment: () => void;
   onCustomerClick: (id: string) => void;
 }) {
+  const language = useUIStore.getState().language;
   const paid = sumPaid(invoice?.payments);
   const total = invoice?.totalAmount || 0;
   const balance = calculateInvoiceBalance(total, invoice?.payments || []);
@@ -229,7 +231,7 @@ function InvoiceDetailSheet({
           </div>
           <SheetDescription>
             {invoice
-              ? `Issued ${formatDate(invoice.createdAt)} · Due ${formatDate(invoice.dueDate)}`
+              ? `${t("issued", language)} ${formatDate(invoice.createdAt, language)} · ${t("due", language)} ${formatDate(invoice.dueDate, language)}`
               : ""}
           </SheetDescription>
         </SheetHeader>
@@ -238,7 +240,7 @@ function InvoiceDetailSheet({
           <div className="flex-1 space-y-5 overflow-y-auto px-5 py-4">
             {/* Customer card */}
             <div className="rounded-lg border border-border/60 p-3">
-              <p className="text-xs text-muted-foreground">Billed to</p>
+              <p className="text-xs text-muted-foreground">{t("billed_to", language)}</p>
               <button
                 onClick={() => onCustomerClick(invoice.customer.id)}
                 className="mt-0.5 text-sm font-medium text-foreground hover:text-blue-400 hover:underline dark:hover:text-blue-400"
@@ -247,7 +249,7 @@ function InvoiceDetailSheet({
               </button>
               {invoice.deal && (
                 <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span>Linked deal:</span>
+                  <span>{t("linked_deal", language)}</span>
                   <Badge variant="outline" className="font-normal">
                     {invoice.deal.title}
                   </Badge>
@@ -258,16 +260,16 @@ function InvoiceDetailSheet({
             {/* Line items */}
             <div>
               <h3 className="mb-2 text-sm font-semibold text-foreground">
-                Line Items
+                {t("line_items", language)}
               </h3>
               <div className="overflow-hidden rounded-lg border border-border/60">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Product</TableHead>
-                      <TableHead className="w-16 text-right">Qty</TableHead>
-                      <TableHead className="text-right">Unit</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead>{t("product", language)}</TableHead>
+                      <TableHead className="w-16 text-right">{t("qty", language)}</TableHead>
+                      <TableHead className="text-right">{t("unit", language)}</TableHead>
+                      <TableHead className="text-right">{t("total", language)}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -277,7 +279,7 @@ function InvoiceDetailSheet({
                           colSpan={4}
                           className="py-6 text-center text-xs text-muted-foreground"
                         >
-                          No line items
+                          {t("no_line_items", language)}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -290,10 +292,10 @@ function InvoiceDetailSheet({
                             {item.quantity}
                           </TableCell>
                           <TableCell className="text-right text-sm">
-                            {formatCurrency(item.unitPrice)}
+                            {formatCurrency(item.unitPrice, language)}
                           </TableCell>
                           <TableCell className="text-right text-sm font-medium">
-                            {formatCurrency(item.quantity * item.unitPrice)}
+                            {formatCurrency(item.quantity * item.unitPrice, language)}
                           </TableCell>
                         </TableRow>
                       ))
@@ -305,7 +307,7 @@ function InvoiceDetailSheet({
                         Total
                       </TableCell>
                       <TableCell className="text-right text-sm font-semibold text-foreground">
-                        {formatCurrency(total)}
+                        {formatCurrency(total, language)}
                       </TableCell>
                     </TableRow>
                   </TableFooter>
@@ -317,7 +319,7 @@ function InvoiceDetailSheet({
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-foreground">
-                  Payments
+                  {t("payments", language)}
                 </h3>
                 <Button
                   size="sm"
@@ -325,12 +327,12 @@ function InvoiceDetailSheet({
                   onClick={onRecordPayment}
                   className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-700 dark:border-blue-900/50 dark:text-blue-400 dark:hover:bg-blue-950/30"
                 >
-                  <Plus className="size-3.5" /> Record Payment
+                  <Plus className="size-3.5" /> {t("record_payment", language)}
                 </Button>
               </div>
               {invoice.payments.length === 0 ? (
                 <p className="rounded-lg border border-dashed border-border py-4 text-center text-xs text-muted-foreground">
-                  No payments recorded yet
+                  {t("no_payments_recorded", language)}
                 </p>
               ) : (
                 <div className="space-y-2">
@@ -342,12 +344,12 @@ function InvoiceDetailSheet({
                       <div className="flex items-center gap-2">
                         <PaymentMethodBadge method={p.paymentMethod} />
                         <span className="text-xs text-muted-foreground">
-                          {formatDate(p.date)}
+                          {formatDate(p.date, language)}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                        {formatCurrency(p.amount)}
-                      </span>
+                        <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                          {formatCurrency(p.amount, language)}
+                        </span>
                     </div>
                   ))}
                 </div>
@@ -357,20 +359,20 @@ function InvoiceDetailSheet({
             {/* Summary */}
             <div className="space-y-2 rounded-lg border border-border/60 p-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Total</span>
+                <span className="text-muted-foreground">{t("total_label", language)}</span>
                 <span className="font-medium text-foreground">
-                  {formatCurrency(total)}
+                  {formatCurrency(total, language)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Paid</span>
+                <span className="text-muted-foreground">{t("paid_label", language)}</span>
                 <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                  {formatCurrency(paid)}
+                  {formatCurrency(paid, language)}
                 </span>
               </div>
               <Separator />
               <div className="flex justify-between text-sm">
-                <span className="font-medium text-foreground">Balance due</span>
+                <span className="font-medium text-foreground">{t("balance_due_label", language)}</span>
                 <span
                   className={cn(
                     "font-semibold",
@@ -379,7 +381,7 @@ function InvoiceDetailSheet({
                       : "text-amber-600 dark:text-amber-400",
                   )}
                 >
-                  {formatCurrency(balance)}
+                  {formatCurrency(balance, language)}
                 </span>
               </div>
             </div>
@@ -542,14 +544,14 @@ function RecordPaymentDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("cancel", language)}
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={submitting}
             className="bg-blue-600 text-white hover:bg-blue-700"
           >
-            {submitting ? "Saving..." : "Record Payment"}
+            {submitting ? t("saving", language) : t("record_payment", language)}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -682,12 +684,12 @@ function InvoiceFormDialog({
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>
-            {invoice ? "Edit Invoice" : "New Invoice"}
+            {invoice ? t("edit_invoice", language) : t("new_invoice", language)}
           </DialogTitle>
           <DialogDescription>
             {invoice
-              ? `Update ${invoice.number} and its line items.`
-              : "Create a new invoice. The invoice number and total are generated automatically."}
+              ? `${t("update_invoice", language)} ${invoice.number} ${t("and_line_items", language)}`
+              : t("create_invoice_description", language)}
           </DialogDescription>
         </DialogHeader>
 
@@ -700,7 +702,7 @@ function InvoiceFormDialog({
               </Label>
               <Select value={customerId} onValueChange={handleCustomerChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a customer" />
+                  <SelectValue placeholder={t("select_customer", language)} />
                 </SelectTrigger>
                 <SelectContent>
                   {customers.map((c) => (
@@ -720,10 +722,10 @@ function InvoiceFormDialog({
                 disabled={!customerId}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="None" />
+                  <SelectValue placeholder={t("none", language)} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="none">{t("none", language)}</SelectItem>
                   {customerDeals.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {d.title}
@@ -733,7 +735,7 @@ function InvoiceFormDialog({
               </Select>
               {!customerId && (
                 <p className="text-xs text-muted-foreground">
-                  Select a customer first to link a deal.
+                  {t("select_customer_first_link_deal", language)}
                 </p>
               )}
             </div>
@@ -781,7 +783,7 @@ function InvoiceFormDialog({
                 variant="outline"
                 onClick={addItem}
               >
-                <Plus className="size-3.5" /> Add Item
+                <Plus className="size-3.5" /> {t("add_item", language)}
               </Button>
             </div>
 
@@ -791,10 +793,10 @@ function InvoiceFormDialog({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Product</TableHead>
-                      <TableHead className="w-20 text-right">Qty</TableHead>
-                      <TableHead className="w-32 text-right">Unit Price</TableHead>
-                      <TableHead className="w-32 text-right">Line Total</TableHead>
+                      <TableHead>{t("product", language)}</TableHead>
+                      <TableHead className="w-20 text-right">{t("qty", language)}</TableHead>
+                      <TableHead className="w-32 text-right">{t("unit_price", language)}</TableHead>
+                      <TableHead className="w-32 text-right">{t("line_total", language)}</TableHead>
                       <TableHead className="w-10"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -806,8 +808,8 @@ function InvoiceFormDialog({
                             value={it.productId}
                             onValueChange={(v) => onProductSelect(it.key, v)}
                           >
-                            <SelectTrigger className="h-8 w-full">
-                              <SelectValue placeholder="Select product" />
+                              <SelectTrigger className="h-8 w-full">
+                              <SelectValue placeholder={t("select_product", language)} />
                             </SelectTrigger>
                             <SelectContent>
                               {products.map((p) => (
@@ -845,11 +847,12 @@ function InvoiceFormDialog({
                             className="h-8 w-32 text-right"
                           />
                         </TableCell>
-                        <TableCell className="text-right text-sm font-medium text-foreground">
-                          {formatCurrency(
-                            (Number(it.quantity) || 0) *
-                              (Number(it.unitPrice) || 0),
-                          )}
+                          <TableCell className="text-right text-sm font-medium text-foreground">
+                            {formatCurrency(
+                              (Number(it.quantity) || 0) *
+                                (Number(it.unitPrice) || 0),
+                              language,
+                            )}
                         </TableCell>
                         <TableCell>
                           <Button
@@ -878,7 +881,7 @@ function InvoiceFormDialog({
                       onValueChange={(v) => onProductSelect(it.key, v)}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select product" />
+                        <SelectValue placeholder={t("select_product", language)} />
                       </SelectTrigger>
                       <SelectContent>
                         {products.map((p) => (
@@ -926,6 +929,7 @@ function InvoiceFormDialog({
                         {formatCurrency(
                           (Number(it.quantity) || 0) *
                             (Number(it.unitPrice) || 0),
+                          language,
                         )}
                       </span>
                       <Button
@@ -947,9 +951,9 @@ function InvoiceFormDialog({
             {/* Running total */}
             <div className="flex justify-end">
               <div className="rounded-lg bg-blue-500/10 px-4 py-2 dark:bg-blue-950/30">
-                <span className="text-xs text-muted-foreground">Total: </span>
+                <span className="text-xs text-muted-foreground">{t("total_label", language)}</span>
                 <span className="text-base font-semibold text-blue-700 dark:text-blue-400">
-                  {formatCurrency(total)}
+                  {formatCurrency(total, language)}
                 </span>
               </div>
             </div>
@@ -964,7 +968,7 @@ function InvoiceFormDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("cancel", language)}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -972,10 +976,10 @@ function InvoiceFormDialog({
             className="bg-blue-600 text-white hover:bg-blue-700"
           >
             {submitting
-              ? "Saving..."
+              ? t("saving", language)
               : invoice
-                ? "Save Changes"
-                : "Create Invoice"}
+                ? t("save_changes", language)
+                : t("create_invoice", language)}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -989,6 +993,7 @@ export function InvoicesModule() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { openCustomerDetail, setModule } = useUIStore();
+  const language = useUIStore.getState().language;
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -1211,14 +1216,14 @@ export function InvoicesModule() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Invoices"
-        description="Create, track, and manage customer invoices"
+        title={t("invoices", language)}
+        description={t("invoices_description", language)}
         action={
           <Button
             onClick={openCreateForm}
             className="bg-blue-600 text-white hover:bg-blue-700"
           >
-            <Plus className="size-4" /> New Invoice
+            <Plus className="size-4" /> {t("new_invoice", language)}
           </Button>
         }
       />
@@ -1227,25 +1232,25 @@ export function InvoicesModule() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           icon={FileText}
-          label="Total Billed"
-          value={formatCurrency(stats.totalBilled)}
+          label={t("total_billed", language)}
+          value={formatCurrency(stats.totalBilled, language)}
           accent="from-blue-500 to-sky-600"
         />
         <StatCard
           icon={Banknote}
-          label="Paid"
-          value={formatCurrency(stats.paid)}
+          label={t("paid", language)}
+          value={formatCurrency(stats.paid, language)}
           accent="from-blue-500 to-sky-600"
         />
         <StatCard
           icon={Wallet}
-          label="Outstanding"
-          value={formatCurrency(stats.outstanding)}
+          label={t("outstanding", language)}
+          value={formatCurrency(stats.outstanding, language)}
           accent="from-amber-500 to-orange-600"
         />
         <StatCard
           icon={AlertCircle}
-          label="Overdue"
+          label={t("overdue", language)}
           value={String(stats.overdueCount)}
           accent="from-rose-500 to-red-600"
         />
@@ -1256,7 +1261,7 @@ export function InvoicesModule() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by invoice number or customer..."
+            placeholder={t("search_invoices_placeholder", language)}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -1264,10 +1269,10 @@ export function InvoicesModule() {
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All statuses" />
+            <SelectValue placeholder={t("all_statuses", language)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="all">{t("all_statuses", language)}</SelectItem>
             {Object.entries(INVOICE_STATUS).map(([key, cfg]) => (
               <SelectItem key={key} value={key}>
                 {cfg.label}
@@ -1279,22 +1284,22 @@ export function InvoicesModule() {
 
       {/* Table */}
       {isLoading ? (
-        <LoadingState label="Loading invoices..." />
+        <LoadingState label={t("loading_invoices", language)} />
       ) : filteredInvoices.length === 0 ? (
         <EmptyState
           icon={FileText}
-          title="No invoices found"
+          title={t("no_invoices_found", language)}
           description={
             search || statusFilter !== "all"
-              ? "Try adjusting your filters to see more results."
-              : "Create your first invoice to get started."
+              ? t("try_adjust_filters", language)
+              : t("create_first_invoice", language)
           }
           action={
             <Button
               onClick={openCreateForm}
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
-              <Plus className="size-4" /> New Invoice
+              <Plus className="size-4" /> {t("new_invoice", language)}
             </Button>
           }
         />
@@ -1304,14 +1309,14 @@ export function InvoicesModule() {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-card">
                 <TableRow>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Deal</TableHead>
-                  <TableHead>Issued</TableHead>
-                  <TableHead>Due</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead className="text-right">Paid</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t("invoice_number", language)}</TableHead>
+                  <TableHead>{t("table_customer", language)}</TableHead>
+                  <TableHead>{t("deal_singular", language)}</TableHead>
+                  <TableHead>{t("issued", language)}</TableHead>
+                  <TableHead>{t("due", language)}</TableHead>
+                  <TableHead className="text-right">{t("total", language)}</TableHead>
+                  <TableHead className="text-right">{t("paid", language)}</TableHead>
+                  <TableHead>{t("status", language)}</TableHead>
                   <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -1350,16 +1355,16 @@ export function InvoicesModule() {
                         )}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {formatDate(inv.createdAt)}
+                        {formatDate(inv.createdAt, language)}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {formatDate(inv.dueDate)}
+                        {formatDate(inv.dueDate, language)}
                       </TableCell>
                       <TableCell className="text-right font-medium text-foreground">
-                        {formatCurrency(inv.totalAmount)}
+                        {formatCurrency(inv.totalAmount, language)}
                       </TableCell>
                       <TableCell className="text-right font-medium text-emerald-600 dark:text-emerald-400">
-                        {formatCurrency(paid)}
+                        {formatCurrency(paid, language)}
                       </TableCell>
                       <TableCell>
                         <InvoiceStatusBadge status={inv.status} />
@@ -1379,19 +1384,19 @@ export function InvoicesModule() {
                             <DropdownMenuItem
                               onClick={() => openInvoiceDetail(inv)}
                             >
-                              <FileText className="size-4" /> View details
+                              <FileText className="size-4" /> {t("view", language)}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => openEditForm(inv)}
                             >
-                              <Pencil className="size-4" /> Edit
+                              <Pencil className="size-4" /> {t("edit", language)}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               variant="destructive"
                               onClick={() => setConfirmDelete(inv)}
                             >
-                              <Trash2 className="size-4" /> Delete
+                              <Trash2 className="size-4" /> {t("delete", language)}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

@@ -38,6 +38,8 @@ import {
   INTERACTION_TYPE,
 } from "@/lib/erp-constants";
 import { LoadingState, PageHeader } from "@/components/erp/empty-states";
+import { t } from "@/lib/translations";
+import { useUIStore } from "@/store/ui-store";
 import {
   InvoiceStatusBadge,
   InteractionTypeBadge,
@@ -135,6 +137,7 @@ function PipelineTooltip({ active, payload }: {
   if (!active || !payload || payload.length === 0) return null;
   const item = payload[0].payload;
   const stageCfg = DEAL_STAGE[item.stage as keyof typeof DEAL_STAGE];
+  const language = useUIStore.getState().language;
   return (
     <div className="rounded-lg border border-border bg-popover px-3 py-2.5 shadow-lg">
       <div className="flex items-center gap-2">
@@ -145,13 +148,13 @@ function PipelineTooltip({ active, payload }: {
       </div>
       <div className="mt-1.5 space-y-0.5">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-[11px] text-muted-foreground">Total value</span>
+          <span className="text-[11px] text-muted-foreground">{t("kpi_total_value", language)}</span>
           <span className="text-xs font-bold text-foreground">
-            {formatCurrency(item.value)}
+            {formatCurrency(item.value, language)}
           </span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-[11px] text-muted-foreground">Deals</span>
+          <span className="text-[11px] text-muted-foreground">{t("kpi_deals", language)}</span>
           <span className="text-xs font-medium text-foreground">{item.count}</span>
         </div>
       </div>
@@ -168,6 +171,7 @@ function InvoiceStatusTooltip({ active, payload }: {
   const item = payload[0].payload;
   const statusCfg = INVOICE_STATUS[item.status as keyof typeof INVOICE_STATUS];
   const color = PIE_COLORS[item.status] || "#a1a1aa";
+  const language = useUIStore.getState().language;
   return (
     <div className="rounded-lg border border-border bg-popover px-3 py-2.5 shadow-lg">
       <div className="flex items-center gap-2">
@@ -178,14 +182,12 @@ function InvoiceStatusTooltip({ active, payload }: {
       </div>
       <div className="mt-1.5 space-y-0.5">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-[11px] text-muted-foreground">Invoices</span>
+          <span className="text-[11px] text-muted-foreground">{t("invoice_count", language)}</span>
           <span className="text-xs font-bold text-foreground">{item.count}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-[11px] text-muted-foreground">Amount</span>
-          <span className="text-xs font-medium text-foreground">
-            {formatCurrency(item.amount)}
-          </span>
+          <span className="text-[11px] text-muted-foreground">{t("amount", language)}</span>
+          <span className="text-xs font-medium text-foreground">{formatCurrency(item.amount, language)}</span>
         </div>
       </div>
     </div>
@@ -201,15 +203,16 @@ export function DashboardModule() {
     },
   });
   const setModule = useUIStore((s) => s.setModule);
+  const language = useUIStore.getState().language;
 
   if (isLoading || !data) {
     return (
       <div>
         <PageHeader
-          title="Dashboard"
-          description="Overview of your business performance"
+          title={t("dashboard", language)}
+          description={t("total_revenue", language)}
         />
-        <LoadingState label="Loading dashboard..." />
+        <LoadingState label={t("loading_dashboard", language)} />
       </div>
     );
   }
@@ -228,41 +231,41 @@ export function DashboardModule() {
     iconBg: string;
   }> = [
     {
-      label: "Total Revenue",
-      value: formatCurrency(data.revenue.total),
+      label: t("total_revenue", language),
+      value: formatCurrency(data.revenue.total, language),
       icon: TrendingUp,
       delta: formatPct(revPct),
-      sub: `${formatCurrency(data.deltas.revenueThisMonth)} this month`,
+      sub: `${formatCurrency(data.deltas.revenueThisMonth, language)} ${t("this_month", language)}`,
       trend: revPct === null ? "flat" : revPct >= 0 ? "up" : "down",
       accent: "from-blue-500 to-sky-600",
       iconBg: "from-blue-500 to-sky-600",
     },
     {
-      label: "Outstanding",
-      value: formatCurrency(data.revenue.outstanding),
+      label: t("outstanding", language),
+      value: formatCurrency(data.revenue.outstanding, language),
       icon: Wallet,
-      delta: data.deltas.overdueCount > 0 ? `${data.deltas.overdueCount} overdue` : "On track",
-      sub: "Awaiting payment",
+      delta: data.deltas.overdueCount > 0 ? `${data.deltas.overdueCount} ${t("overdue_count_suffix", language)}` : t("on_track", language) || "On track",
+      sub: t("awaiting_payment", language),
       trend: data.deltas.overdueCount > 0 ? "down" : "flat",
       accent: "from-amber-500 to-orange-600",
       iconBg: "from-amber-500 to-orange-600",
     },
     {
-      label: "Pipeline Value",
-      value: formatCurrency(data.revenue.pipeline),
+      label: t("pipeline_value", language),
+      value: formatCurrency(data.revenue.pipeline, language),
       icon: Handshake,
-      delta: `${data.deltas.openDealsCount} open`,
-      sub: `${formatCurrency(data.revenue.won)} won`,
+      delta: `${data.deltas.openDealsCount} ${t("open_deals_suffix", language)}`,
+      sub: `${formatCurrency(data.revenue.won, language)} ${t("won", language) || "won"}`,
       trend: "up",
       accent: "from-violet-500 to-purple-600",
       iconBg: "from-violet-500 to-purple-600",
     },
     {
-      label: "Total Customers",
-      value: formatNumber(data.counts.customers),
+      label: t("total_customers", language),
+      value: formatNumber(data.counts.customers, language),
       icon: Users,
       delta: formatPct(custPct),
-      sub: `${data.deltas.customersNewThisMonth} new this month`,
+      sub: `${data.deltas.customersNewThisMonth} ${t("new", language)} ${t("this_month", language)}`,
       trend: custPct === null ? "flat" : custPct >= 0 ? "up" : "down",
       accent: "from-sky-500 to-cyan-600",
       iconBg: "from-sky-500 to-cyan-600",
@@ -272,8 +275,8 @@ export function DashboardModule() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dashboard"
-        description="Overview of your business performance at a glance"
+        title={t("dashboard", language)}
+        description={t("dashboard_description", language)}
       />
 
       {/* KPI Cards */}
@@ -330,16 +333,17 @@ export function DashboardModule() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base font-semibold">Revenue Trend</CardTitle>
-                <p className="mt-0.5 text-xs text-muted-foreground">Last 6 months</p>
+                <CardTitle className="text-base font-semibold">{t("revenue_trend", language)}</CardTitle>
+                <p className="mt-0.5 text-xs text-muted-foreground">{t("last_6_months", language)}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-semibold text-blue-400">
                   {formatCurrency(
                     data.revenueTrend.reduce((s, m) => s + m.revenue, 0),
+                    language,
                   )}
                 </p>
-                <p className="text-[11px] text-muted-foreground">6-month total</p>
+                <p className="text-[11px] text-muted-foreground">{t("six_month_total", language)}</p>
               </div>
             </div>
           </CardHeader>
