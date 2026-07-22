@@ -10,6 +10,8 @@ import {
 import { ConfirmDialog } from "@/components/erp/confirm-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, formatDate } from "@/lib/erp-constants";
+import { t } from "@/lib/translations";
+import { useUIStore } from "@/store/ui-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -62,6 +64,7 @@ function getInitials(name: string): string {
 const emptyForm = { name: "", price: "", description: "" };
 
 export function ProductsModule() {
+  const { language } = useUIStore();
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -110,15 +113,15 @@ export function ProductsModule() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast({
-        title: "Product created",
-        description: "The product has been added to your catalog.",
+        title: t("product_created", language),
+        description: t("product_created_desc", language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: "Something went wrong",
-        description: "Could not create the product. Please try again.",
+        title: t("error_something_wrong", language),
+        description: t("error_try_again", language),
         variant: "destructive",
       });
     },
@@ -143,15 +146,15 @@ export function ProductsModule() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast({
-        title: "Product updated",
-        description: "Your changes have been saved.",
+        title: t("product_updated", language),
+        description: t("product_updated_desc", language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: "Something went wrong",
-        description: "Could not update the product. Please try again.",
+        title: t("error_something_wrong", language),
+        description: t("error_try_again", language),
         variant: "destructive",
       });
     },
@@ -166,15 +169,15 @@ export function ProductsModule() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast({
-        title: "Product deleted",
-        description: "The product has been removed from your catalog.",
+        title: t("product_deleted", language),
+        description: t("product_deleted_desc", language),
       });
       setDeleteTarget(null);
     },
     onError: () => {
       toast({
-        title: "Something went wrong",
-        description: "Could not delete the product. Please try again.",
+        title: t("error_something_wrong", language),
+        description: t("error_try_again", language),
         variant: "destructive",
       });
     },
@@ -200,12 +203,12 @@ export function ProductsModule() {
 
   function validate(): boolean {
     const err: { name?: string; price?: string } = {};
-    if (!form.name.trim()) err.name = "Name is required";
+    if (!form.name.trim()) err.name = t("validation_name_required", language);
     const priceNum = Number(form.price);
     if (form.price === "" || Number.isNaN(priceNum)) {
-      err.price = "Price is required";
+      err.price = t("price_is_required", language);
     } else if (priceNum < 0) {
-      err.price = "Price cannot be negative";
+      err.price = t("price_cannot_be_negative", language);
     }
     setFormError(err);
     return Object.keys(err).length === 0;
@@ -233,15 +236,15 @@ export function ProductsModule() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Products & Services"
-        description="Manage your catalog of products and services offered to customers."
+        title={t("products_page_title", language)}
+        description={t("products_page_desc", language)}
         action={
           <Button
             onClick={openCreate}
             className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
           >
             <Plus className="size-4" />
-            New Product
+            {t("new_product", language)}
           </Button>
         }
       />
@@ -252,22 +255,22 @@ export function ProductsModule() {
         <Input
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Search products by name..."
+          placeholder={t("search_products", language)}
           className="pl-9"
-          aria-label="Search products"
+          aria-label={t("search_products", language)}
         />
       </div>
 
       {isLoading ? (
-        <LoadingState label="Loading products..." />
+        <LoadingState label={t("loading_products", language)} />
       ) : products.length === 0 ? (
         <EmptyState
           icon={Package}
-          title={search ? "No products found" : "No products yet"}
+          title={search ? t("no_products_found", language) : t("no_products_yet", language)}
           description={
             search
-              ? "Try a different search term or clear the search to see all products."
-              : "Add your first product or service to start building your catalog."
+              ? t("no_products_search_desc", language)
+              : t("no_products_desc", language)
           }
           action={
             !search ? (
@@ -276,14 +279,14 @@ export function ProductsModule() {
                 className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
               >
                 <Plus className="size-4" />
-                Add Product
+                {t("add_product", language)}
               </Button>
             ) : (
               <Button
                 variant="outline"
                 onClick={() => setSearchInput("")}
               >
-                Clear search
+                {t("clear_search", language)}
               </Button>
             )
           }
@@ -314,7 +317,7 @@ export function ProductsModule() {
                     <DropdownMenuContent align="end" className="w-36">
                       <DropdownMenuItem onClick={() => openEdit(p)}>
                         <Pencil className="size-4" />
-                        Edit
+                        {t("edit", language)}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -322,7 +325,7 @@ export function ProductsModule() {
                         onClick={() => setDeleteTarget(p)}
                       >
                         <Trash2 className="size-4" />
-                        Delete
+                        {t("delete", language)}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -342,29 +345,29 @@ export function ProductsModule() {
                       {p.name}
                     </h3>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      Added {formatDate(p.createdAt)}
+                      {t("added", language)} {formatDate(p.createdAt)}
                     </p>
                   </div>
                 </div>
 
                 {/* Description (2-line clamp) */}
                 <p className="mt-3 line-clamp-2 min-h-[2.5rem] text-sm text-muted-foreground">
-                  {p.description || "No description provided."}
+                  {p.description || t("no_description", language)}
                 </p>
 
                 {/* Footer: price + usage */}
                 <div className="mt-4 flex items-end justify-between border-t border-border pt-3">
                   <div>
                     <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                      Price
+                      {t("price", language)}
                     </p>
                     <p className="text-lg font-semibold text-blue-400">
                       {formatCurrency(p.price)}
                     </p>
                   </div>
                   <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-500/15 dark:text-zinc-400">
-                    Used in {usageCount}{" "}
-                    {usageCount === 1 ? "invoice" : "invoices"}
+                    {t("used_in", language)} {usageCount}{" "}
+                    {usageCount === 1 ? t("invoice_singular", language) : t("invoice_plural", language)}
                   </span>
                 </div>
               </Card>
@@ -383,24 +386,24 @@ export function ProductsModule() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editing ? "Edit Product" : "New Product"}
+              {editing ? t("edit_product", language) : t("new_product", language)}
             </DialogTitle>
             <DialogDescription>
               {editing
-                ? "Update the details of this product or service."
-                : "Add a new product or service to your catalog."}
+                ? t("edit_product_desc", language)
+                : t("create_product_desc", language)}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="product-name">
-                Name <span className="text-rose-500">*</span>
+                {t("name_label", language)} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="product-name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Web Design Service"
+                placeholder={t("name_placeholder", language)}
                 autoFocus
                 aria-invalid={!!formError.name}
               />
@@ -411,7 +414,7 @@ export function ProductsModule() {
 
             <div className="space-y-2">
               <Label htmlFor="product-price">
-                Price (EGP) <span className="text-rose-500">*</span>
+                {t("price_label", language)} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="product-price"
@@ -429,14 +432,14 @@ export function ProductsModule() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="product-description">Description</Label>
+              <Label htmlFor="product-description">{t("description_label", language)}</Label>
               <Textarea
                 id="product-description"
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                placeholder="Optional description of the product or service..."
+                placeholder={t("description_placeholder", language)}
                 rows={3}
               />
             </div>
@@ -448,7 +451,7 @@ export function ProductsModule() {
                 onClick={() => setDialogOpen(false)}
                 disabled={isSaving}
               >
-                Cancel
+                {t("cancel", language)}
               </Button>
               <Button
                 type="submit"
@@ -456,10 +459,10 @@ export function ProductsModule() {
                 className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
               >
                 {isSaving
-                  ? "Saving..."
+                  ? t("saving", language)
                   : editing
-                    ? "Save Changes"
-                    : "Create Product"}
+                    ? t("save_changes", language)
+                    : t("create_product", language)}
               </Button>
             </DialogFooter>
           </form>
@@ -472,13 +475,13 @@ export function ProductsModule() {
         onOpenChange={(v) => {
           if (!isDeleting && !v) setDeleteTarget(null);
         }}
-        title="Delete product?"
+        title={t("delete_product", language)}
         description={
           deleteTarget
-            ? `Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`
+            ? t("delete_product_confirm", language).replace("{name}", deleteTarget.name)
             : ""
         }
-        confirmText={isDeleting ? "Deleting..." : "Delete"}
+        confirmText={isDeleting ? t("deleting", language) : t("delete", language)}
         onConfirm={() => {
           if (deleteTarget && !isDeleting) deleteMutation.mutate(deleteTarget.id);
         }}

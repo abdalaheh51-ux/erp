@@ -10,6 +10,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { t } from "@/lib/translations";
+import { useUIStore } from "@/store/ui-store";
 
 export function ConfirmDialog({
   open,
@@ -26,20 +28,25 @@ export function ConfirmDialog({
   confirmText?: string;
   onConfirm: () => void;
 }) {
+  const { language } = useUIStore();
+  const titleText = title === "Are you sure?" ? t("are_you_sure", language) : title;
+  const descText = description === "This action cannot be undone." ? t("this_action_cannot_be_undone", language) : description;
+  const btnText = confirmText === "Delete" ? t("delete", language) : confirmText;
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle>{titleText}</AlertDialogTitle>
+          <AlertDialogDescription>{descText}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("cancel", language)}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-600"
           >
-            {confirmText}
+            {btnText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
