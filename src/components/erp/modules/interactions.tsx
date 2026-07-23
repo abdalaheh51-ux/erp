@@ -14,6 +14,7 @@ import { useUIStore } from "@/store/ui-store";
 import { t } from "@/lib/translations";
 import {
   INTERACTION_TYPE,
+  getInteractionTypeLabel,
   formatDate,
   formatDateTime,
   timeAgo,
@@ -131,6 +132,7 @@ const emptyForm = {
 };
 
 export function InteractionsModule() {
+  const language = useUIStore.getState().language;
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -395,7 +397,7 @@ export function InteractionsModule() {
             <SelectItem value="all">{t("all_types", useUIStore.getState().language)}</SelectItem>
             {TYPE_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>
-                {INTERACTION_TYPE[t].label}
+                {getInteractionTypeLabel(t, language)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -404,27 +406,27 @@ export function InteractionsModule() {
 
       {/* States / feed */}
       {isLoading ? (
-        <LoadingState label="Loading activity..." />
+        <LoadingState label={t("loading_activity", language)} />
       ) : interactions.length === 0 ? (
         <EmptyState
           icon={MessageSquarePlus}
-          title="No activity logged yet"
-          description="Start tracking your customer interactions by logging your first call, meeting, email or note."
+          title={t("no_activity_logged_yet", language)}
+          description={t("no_activity_logged_yet_desc", language)}
           action={
             <Button
               onClick={openCreate}
               className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
             >
               <Plus className="size-4" />
-              Log Interaction
+              {t("log_interaction", language)}
             </Button>
           }
         />
       ) : filtered.length === 0 ? (
         <EmptyState
           icon={Search}
-          title="No matching interactions"
-          description="Try adjusting your search or type filter to find what you're looking for."
+          title={t("no_matching_interactions", language)}
+          description={t("no_matching_interactions_desc", language)}
           action={
             <Button
               variant="outline"
@@ -490,7 +492,7 @@ export function InteractionsModule() {
                             <button
                               onClick={() => openCustomer(it.customer.id)}
                               className="inline-flex items-center gap-1.5 truncate text-sm font-semibold text-foreground hover:text-blue-400 hover:underline dark:hover:text-blue-400"
-                              title={`Open ${it.customer.name}`}
+                              title={t("open_customer", language).replace("{name}", it.customer.name)}
                             >
                               <span className="size-5 rounded-full bg-blue-500/10 text-center text-[10px] font-semibold leading-5 text-blue-400">
                                 {getInitials(it.customer.name)}
@@ -585,7 +587,7 @@ export function InteractionsModule() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="interaction-customer">
-                Customer <span className="text-rose-500">*</span>
+                {t("customer", language)} <span className="text-rose-500">*</span>
               </Label>
               <Select
                 value={form.customerId}
@@ -629,7 +631,7 @@ export function InteractionsModule() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="interaction-type">Type</Label>
+                <Label htmlFor="interaction-type">{t("type_label", language)}</Label>
                 <Select
                   value={form.type}
                   onValueChange={(v) =>
@@ -646,7 +648,7 @@ export function InteractionsModule() {
                         <SelectItem key={t} value={t}>
                           <span className="flex items-center gap-2">
                             <Icon className="size-4" />
-                            {INTERACTION_TYPE[t].label}
+                            {getInteractionTypeLabel(t, language)}
                           </span>
                         </SelectItem>
                       );
@@ -655,7 +657,7 @@ export function InteractionsModule() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="interaction-date">Date & time</Label>
+                <Label htmlFor="interaction-date">{t("date_label", language)}</Label>
                 <Input
                   id="interaction-date"
                   type="datetime-local"
@@ -669,7 +671,7 @@ export function InteractionsModule() {
 
             <div className="space-y-2">
               <Label htmlFor="interaction-content">
-                Content <span className="text-rose-500">*</span>
+                {t("content", language)} <span className="text-rose-500">*</span>
               </Label>
               <Textarea
                 id="interaction-content"
@@ -718,13 +720,13 @@ export function InteractionsModule() {
         onOpenChange={(v) => {
           if (!isDeleting && !v) setDeleteTarget(null);
         }}
-        title="Delete interaction?"
+        title={t("delete_interaction_title", language)}
         description={
           deleteTarget
-            ? "Are you sure you want to delete this interaction? This action cannot be undone."
+            ? `${t("delete_interaction_desc", language)} ${t("this_action_cannot_be_undone", language)}`
             : ""
         }
-        confirmText={isDeleting ? "Deleting..." : "Delete"}
+        confirmText={isDeleting ? t("deleting", language) : t("delete", language)}
         onConfirm={() => {
           if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
         }}

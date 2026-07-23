@@ -1,4 +1,6 @@
 // Shared ERP constants: status enums, labels, colors
+import type { Language } from "@/lib/translations";
+import { translations } from "@/lib/translations";
 
 export const CUSTOMER_STATUS = {
   new: { label: "New", color: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-400", dot: "bg-sky-500" },
@@ -52,6 +54,75 @@ export type InteractionType = keyof typeof INTERACTION_TYPE;
 export type InvoiceStatus = keyof typeof INVOICE_STATUS;
 export type PaymentMethod = keyof typeof PAYMENT_METHOD;
 
+// Translation maps for localized labels
+const CUSTOMER_STATUS_LABELS: Record<string, Record<Language, string>> = {
+  new: { en: "New", ar: "جديد" },
+  lead: { en: "Lead", ar: "عميل محتمل" },
+  active: { en: "Active", ar: "نشط" },
+  inactive: { en: "Inactive", ar: "غير نشط" },
+};
+
+const CUSTOMER_SOURCES_LABELS: Record<string, Record<Language, string>> = {
+  website: { en: "Website", ar: "الموقع الإلكتروني" },
+  social_media: { en: "Social Media", ar: "وسائل التواصل" },
+  referral: { en: "Referral", ar: "إحالة" },
+  ads: { en: "Advertisements", ar: "إعلانات" },
+  other: { en: "Other", ar: "أخرى" },
+};
+
+const DEAL_STAGE_LABELS: Record<string, Record<Language, string>> = {
+  contact: { en: "Initial Contact", ar: "اتصال أولي" },
+  proposal: { en: "Proposal Sent", ar: "تم إرسال العرض" },
+  negotiation: { en: "Negotiation", ar: "مفاوضات" },
+  won: { en: "Closed Won", ar: "مغلقة (تم البيع)" },
+  lost: { en: "Closed Lost", ar: "مغلقة (مفقودة)" },
+};
+
+const INTERACTION_TYPE_LABELS: Record<string, Record<Language, string>> = {
+  note: { en: "Note", ar: "ملاحظة" },
+  call: { en: "Call", ar: "مكالمة" },
+  meeting: { en: "Meeting", ar: "اجتماع" },
+  email: { en: "Email", ar: "بريد إلكتروني" },
+};
+
+const INVOICE_STATUS_LABELS: Record<string, Record<Language, string>> = {
+  draft: { en: "Draft", ar: "مسودة" },
+  pending: { en: "Pending", ar: "قيد الانتظار" },
+  paid: { en: "Paid", ar: "مدفوعة" },
+  overdue: { en: "Overdue", ar: "متأخرة السداد" },
+};
+
+const PAYMENT_METHOD_LABELS: Record<string, Record<Language, string>> = {
+  cash: { en: "Cash", ar: "نقدًا" },
+  bank_transfer: { en: "Bank Transfer", ar: "تحويل بنكي" },
+  payment_gateway: { en: "Payment Gateway", ar: "بوابة دفع" },
+};
+
+// Localized getter functions
+export function getCustomerStatusLabel(status: string, lang: Language): string {
+  return CUSTOMER_STATUS_LABELS[status]?.[lang] || CUSTOMER_STATUS[status as keyof typeof CUSTOMER_STATUS]?.label || status;
+}
+
+export function getCustomerSourceLabel(source: string, lang: Language): string {
+  return CUSTOMER_SOURCES_LABELS[source]?.[lang] || CUSTOMER_SOURCES[source as keyof typeof CUSTOMER_SOURCES] || source;
+}
+
+export function getDealStageLabel(stage: string, lang: Language): string {
+  return DEAL_STAGE_LABELS[stage]?.[lang] || DEAL_STAGE[stage as keyof typeof DEAL_STAGE]?.label || stage;
+}
+
+export function getInteractionTypeLabel(type: string, lang: Language): string {
+  return INTERACTION_TYPE_LABELS[type]?.[lang] || INTERACTION_TYPE[type as keyof typeof INTERACTION_TYPE]?.label || type;
+}
+
+export function getInvoiceStatusLabel(status: string, lang: Language): string {
+  return INVOICE_STATUS_LABELS[status]?.[lang] || INVOICE_STATUS[status as keyof typeof INVOICE_STATUS]?.label || status;
+}
+
+export function getPaymentMethodLabel(method: string, lang: Language): string {
+  return PAYMENT_METHOD_LABELS[method]?.[lang] || PAYMENT_METHOD[method as keyof typeof PAYMENT_METHOD]?.label || method;
+}
+
 export const CURRENCY = "EGP";
 export function getLocaleFromLang(lang?: string) {
   const l = lang || (typeof document !== "undefined" ? document.documentElement.lang : "en");
@@ -100,6 +171,6 @@ export function timeAgo(date: Date | string, lang?: string): string {
 }
 
 // Generate next invoice number: INV-0001
-export async function generateInvoiceNumber(count: number): string {
+export function generateInvoiceNumber(count: number): string {
   return `INV-${String(count + 1).padStart(4, "0")}`;
 }

@@ -19,6 +19,8 @@ import { useUIStore } from "@/store/ui-store";
 import {
   CUSTOMER_SOURCES,
   CUSTOMER_STATUS,
+  getCustomerStatusLabel,
+  getCustomerSourceLabel,
   formatCurrency,
   formatDate,
   formatDateTime,
@@ -182,6 +184,7 @@ export function CustomersModule() {
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState<{ name?: string }>({});
 
+  const language = useUIStore.getState().language;
   const qc = useQueryClient();
   const { toast } = useToast();
   const customerDetail = useUIStore((s) => s.customerDetail);
@@ -407,7 +410,7 @@ export function CustomersModule() {
             <SelectItem value="all">{t("all_statuses", useUIStore.getState().language)}</SelectItem>
             {STATUS_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>
-                {CUSTOMER_STATUS[s].label}
+                {getCustomerStatusLabel(s, language)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -541,7 +544,7 @@ export function CustomersModule() {
                         {c.source ? (
                           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                             <SourceIcon className="size-3.5" />
-                            {CUSTOMER_SOURCES[c.source as CustomerSource] ??
+                            {getCustomerSourceLabel(c.source, language) ??
                               c.source}
                           </span>
                         ) : (
@@ -627,7 +630,7 @@ export function CustomersModule() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editing ? "Edit Customer" : "New Customer"}
+              {editing ? t("edit_customer", language) : t("new_customer", language)}
             </DialogTitle>
             <DialogDescription>
               {editing
@@ -644,7 +647,7 @@ export function CustomersModule() {
                 id="customer-name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Acme Corporation"
+                placeholder={t("company_name_placeholder", language)}
                 autoFocus
                 aria-invalid={!!formError.name}
               />
@@ -655,7 +658,7 @@ export function CustomersModule() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="customer-email">Email</Label>
+                <Label htmlFor="customer-email">{t("email_label", language)}</Label>
                 <Input
                   id="customer-email"
                   type="email"
@@ -663,25 +666,25 @@ export function CustomersModule() {
                   onChange={(e) =>
                     setForm({ ...form, email: e.target.value })
                   }
-                  placeholder="name@company.com"
+                  placeholder={t("email_placeholder", language)}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customer-phone">Phone</Label>
+                <Label htmlFor="customer-phone">{t("phone_label", language)}</Label>
                 <Input
                   id="customer-phone"
                   value={form.phone}
                   onChange={(e) =>
                     setForm({ ...form, phone: e.target.value })
                   }
-                  placeholder="+20 100 000 0000"
+                  placeholder={t("phone_placeholder", language)}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="customer-status">Status</Label>
+                <Label htmlFor="customer-status">{t("status_label", language)}</Label>
                 <Select
                   value={form.status}
                   onValueChange={(v) =>
@@ -694,14 +697,14 @@ export function CustomersModule() {
                   <SelectContent>
                     {STATUS_OPTIONS.map((s) => (
                       <SelectItem key={s} value={s}>
-                        {CUSTOMER_STATUS[s].label}
+                        {getCustomerStatusLabel(s, language)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customer-source">Source</Label>
+                <Label htmlFor="customer-source">{t("source_label", language)}</Label>
                 <Select
                   value={form.source}
                   onValueChange={(v) =>
@@ -714,7 +717,7 @@ export function CustomersModule() {
                   <SelectContent>
                     {SOURCE_OPTIONS.map((s) => (
                       <SelectItem key={s} value={s}>
-                        {CUSTOMER_SOURCES[s]}
+                        {getCustomerSourceLabel(s, language)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -737,10 +740,10 @@ export function CustomersModule() {
                 className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
               >
                 {isSaving
-                  ? "Saving..."
+                  ? t("saving", language)
                   : editing
-                    ? "Save Changes"
-                    : "Create Customer"}
+                    ? t("save_changes", language)
+                    : t("create_customer", language)}
               </Button>
             </DialogFooter>
           </form>
@@ -777,7 +780,7 @@ export function CustomersModule() {
                       <CustomerStatusBadge status={detail.status} />
                       {detail.source && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-500/15 dark:text-zinc-400">
-                          {CUSTOMER_SOURCES[detail.source as CustomerSource] ??
+                          {getCustomerSourceLabel(detail.source, language) ??
                             detail.source}
                         </span>
                       )}
@@ -913,10 +916,8 @@ export function CustomersModule() {
                               );
                             })()}
                             <span className="text-muted-foreground">
-                              Acquired via{" "}
-                              {CUSTOMER_SOURCES[
-                                detail.source as CustomerSource
-                              ] ?? detail.source}
+                              {t("acquired_via", language)}{" "}
+                              {getCustomerSourceLabel(detail.source, language) ?? detail.source}
                             </span>
                           </div>
                         )}
@@ -1084,13 +1085,13 @@ export function CustomersModule() {
         onOpenChange={(v) => {
           if (!isDeleting && !v) setDeleteTarget(null);
         }}
-        title="Delete customer?"
+        title={t("delete_customer_title", language)}
         description={
           deleteTarget
-            ? `Are you sure you want to delete "${deleteTarget.name}"? All related deals, interactions and invoices will also be removed. This action cannot be undone.`
+            ? `${t("delete_customer_desc", language)} "${deleteTarget.name}"? ${t("this_action_cannot_be_undone", language)}`
             : ""
         }
-        confirmText={isDeleting ? "Deleting..." : "Delete"}
+        confirmText={isDeleting ? t("deleting", language) : t("delete", language)}
         onConfirm={() => {
           if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
         }}

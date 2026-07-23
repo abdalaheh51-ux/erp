@@ -36,6 +36,9 @@ import {
   DEAL_STAGE,
   INVOICE_STATUS,
   INTERACTION_TYPE,
+  getDealStageLabel,
+  getInvoiceStatusLabel,
+  getInteractionTypeLabel,
 } from "@/lib/erp-constants";
 import { LoadingState, PageHeader } from "@/components/erp/empty-states";
 import { t } from "@/lib/translations";
@@ -142,7 +145,7 @@ function PipelineTooltip({ active, payload }: {
       <div className="flex items-center gap-2">
         <span className="size-2.5 rounded-full bg-blue-500" />
         <span className="text-xs font-semibold text-foreground">
-          {stageCfg?.label || item.stage}
+          {getDealStageLabel(item.stage, language) || item.stage}
         </span>
       </div>
       <div className="mt-1.5 space-y-0.5">
@@ -176,7 +179,7 @@ function InvoiceStatusTooltip({ active, payload }: {
       <div className="flex items-center gap-2">
         <span className="size-2.5 rounded-full" style={{ background: color }} />
         <span className="text-xs font-semibold text-foreground">
-          {statusCfg?.label || item.status}
+          {getInvoiceStatusLabel(item.status, language) || item.status}
         </span>
       </div>
       <div className="mt-1.5 space-y-0.5">
@@ -370,7 +373,7 @@ export function DashboardModule() {
                   width={45}
                 />
                 <Tooltip
-                  formatter={(v: number) => [formatCurrency(v), "Revenue"]}
+                  formatter={(v: number) => [formatCurrency(v, language), t("revenue", language)]}
                   contentStyle={{
                     borderRadius: "8px",
                     border: "1px solid var(--border)",
@@ -397,9 +400,9 @@ export function DashboardModule() {
         {/* Invoice status pie */}
         <Card className="border-border/60">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Invoice Status</CardTitle>
+            <CardTitle className="text-base font-semibold">{t("invoice_status", language)}</CardTitle>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {formatNumber(data.counts.invoices)} total invoices
+              {formatNumber(data.counts.invoices)} {t("total_invoices", language)}
             </p>
           </CardHeader>
           <CardContent>
@@ -450,9 +453,9 @@ export function DashboardModule() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card className="border-border/60">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Deals Pipeline</CardTitle>
+            <CardTitle className="text-base font-semibold">{t("deals_pipeline", language)}</CardTitle>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Value by stage · {formatCurrency(data.revenue.pipeline)} open
+              {t("value_by_stage", language)} · {formatCurrency(data.revenue.pipeline, language)} {t("open", language)}
             </p>
           </CardHeader>
           <CardContent>
@@ -476,7 +479,7 @@ export function DashboardModule() {
                   tickLine={false}
                   tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   tickFormatter={(v) =>
-                    DEAL_STAGE[v as keyof typeof DEAL_STAGE]?.label || v
+                    getDealStageLabel(v, language) || v
                   }
                   width={110}
                 />
@@ -492,8 +495,8 @@ export function DashboardModule() {
 
         <Card className="border-border/60">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Customer Distribution</CardTitle>
-            <p className="mt-0.5 text-xs text-muted-foreground">By status</p>
+            <CardTitle className="text-base font-semibold">{t("customer_distribution", language)}</CardTitle>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t("by_status", language)}</p>
           </CardHeader>
           <CardContent className="space-y-3 pt-1">
             {data.customerStatusDist.map((c) => {
@@ -526,13 +529,13 @@ export function DashboardModule() {
             })}
             <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border/60 pt-3">
               <div className="rounded-lg bg-muted/40 p-2.5">
-                <p className="text-[11px] text-muted-foreground">Interactions</p>
+                <p className="text-[11px] text-muted-foreground">{t("interactions", language)}</p>
                 <p className="text-lg font-semibold text-foreground">
                   {formatNumber(data.counts.interactions)}
                 </p>
               </div>
               <div className="rounded-lg bg-muted/40 p-2.5">
-                <p className="text-[11px] text-muted-foreground">Payments</p>
+                <p className="text-[11px] text-muted-foreground">{t("payments", language)}</p>
                 <p className="text-lg font-semibold text-foreground">
                   {formatNumber(data.counts.payments)}
                 </p>
@@ -547,18 +550,18 @@ export function DashboardModule() {
         <Card className="border-border/60">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold">Recent Invoices</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("recent_invoices", language)}</CardTitle>
               <button
                 onClick={() => setModule("invoices")}
                 className="text-xs font-medium text-blue-400 hover:text-blue-300 hover:underline"
               >
-                View all
+                {t("view_all", language)}
               </button>
             </div>
           </CardHeader>
           <CardContent className="space-y-0.5">
             {data.recentInvoices.length === 0 && (
-              <p className="py-6 text-center text-sm text-muted-foreground">No invoices yet</p>
+              <p className="py-6 text-center text-sm text-muted-foreground">{t("no_invoices_yet", language)}</p>
             )}
             {data.recentInvoices.map((inv) => (
               <button
@@ -591,18 +594,18 @@ export function DashboardModule() {
         <Card className="border-border/60">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("recent_activity", language)}</CardTitle>
               <button
                 onClick={() => setModule("interactions")}
                 className="text-xs font-medium text-blue-400 hover:text-blue-300 hover:underline"
               >
-                View all
+                {t("view_all", language)}
               </button>
             </div>
           </CardHeader>
           <CardContent className="space-y-0.5">
             {data.recentInteractions.length === 0 && (
-              <p className="py-6 text-center text-sm text-muted-foreground">No activity yet</p>
+              <p className="py-6 text-center text-sm text-muted-foreground">{t("no_activity_yet", language)}</p>
             )}
             {data.recentInteractions.map((act) => (
               <button
@@ -637,18 +640,18 @@ export function DashboardModule() {
       <Card className="border-border/60">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold">Recent Payments</CardTitle>
+            <CardTitle className="text-base font-semibold">{t("recent_payments", language)}</CardTitle>
             <button
               onClick={() => setModule("payments")}
               className="text-xs font-medium text-blue-400 hover:text-blue-300 hover:underline"
             >
-              View all
+              {t("view_all", language)}
             </button>
           </div>
         </CardHeader>
         <CardContent className="space-y-0.5">
           {data.recentPayments.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">No payments yet</p>
+            <p className="py-6 text-center text-sm text-muted-foreground">{t("no_payments_yet", language)}</p>
           )}
           {data.recentPayments.map((p) => (
             <button

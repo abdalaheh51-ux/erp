@@ -71,6 +71,8 @@ import { t } from "@/lib/translations";
 import {
   INVOICE_STATUS,
   PAYMENT_METHOD,
+  getInvoiceStatusLabel,
+  getPaymentMethodLabel,
   formatCurrency,
   formatDate,
   type InvoiceStatus,
@@ -390,14 +392,14 @@ function InvoiceDetailSheet({
 
         <SheetFooter className="flex-row gap-2 border-t px-5 py-3">
           <Button variant="outline" onClick={onEdit} className="flex-1">
-            <Pencil className="size-4" /> Edit
+            <Pencil className="size-4" /> {t("edit", language)}
           </Button>
           <Button
             variant="outline"
             onClick={onDelete}
             className="flex-1 text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:hover:bg-rose-950/30"
           >
-            <Trash2 className="size-4" /> Delete
+            <Trash2 className="size-4" /> {t("delete", language)}
           </Button>
         </SheetFooter>
       </SheetContent>
@@ -463,10 +465,10 @@ function RecordPaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Record Payment</DialogTitle>
+          <DialogTitle>{t("record_payment_title", language)}</DialogTitle>
           <DialogDescription>
             {invoice
-              ? `For invoice ${invoice.number} · ${invoice.customer.name}`
+              ? `${t("for_invoice", language)} ${invoice.number} · ${invoice.customer.name}`
               : ""}
           </DialogDescription>
         </DialogHeader>
@@ -474,19 +476,19 @@ function RecordPaymentDialog({
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2 rounded-lg border border-border/60 p-3 text-center">
             <div>
-              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="text-xs text-muted-foreground">{t("total_small", language)}</p>
               <p className="text-sm font-medium text-foreground">
                 {formatCurrency(invoice?.totalAmount || 0)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Paid</p>
+              <p className="text-xs text-muted-foreground">{t("paid_small", language)}</p>
               <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
                 {formatCurrency(paid)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Balance</p>
+              <p className="text-xs text-muted-foreground">{t("balance_small", language)}</p>
               <p className="text-sm font-semibold text-amber-600 dark:text-amber-400">
                 {formatCurrency(balance)}
               </p>
@@ -495,7 +497,7 @@ function RecordPaymentDialog({
 
           <div className="space-y-1.5">
             <Label>
-              Amount <span className="text-rose-500">*</span>
+              {t("amount_label", language)} <span className="text-rose-500">*</span>
             </Label>
             <Input
               type="number"
@@ -508,7 +510,7 @@ function RecordPaymentDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Method</Label>
+            <Label>{t("method_label", language)}</Label>
             <Select
               value={method}
               onValueChange={(v) => setMethod(v as PaymentMethod)}
@@ -519,7 +521,7 @@ function RecordPaymentDialog({
               <SelectContent>
                 {Object.entries(PAYMENT_METHOD).map(([key, cfg]) => (
                   <SelectItem key={key} value={key}>
-                    {cfg.label}
+                    {getPaymentMethodLabel(key, language)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -527,7 +529,7 @@ function RecordPaymentDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Date</Label>
+            <Label>{t("date_label", language)}</Label>
             <Input
               type="date"
               value={date}
@@ -742,7 +744,7 @@ function InvoiceFormDialog({
             </div>
 
             <div className="space-y-1.5">
-              <Label>Status</Label>
+              <Label>{t("status_label", language)}</Label>
               <Select
                 value={status}
                 onValueChange={(v) => setStatus(v as InvoiceStatus)}
@@ -753,7 +755,7 @@ function InvoiceFormDialog({
                 <SelectContent>
                   {Object.entries(INVOICE_STATUS).map(([key, cfg]) => (
                     <SelectItem key={key} value={key}>
-                      {cfg.label}
+                      {getInvoiceStatusLabel(key, language)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -761,7 +763,7 @@ function InvoiceFormDialog({
             </div>
 
             <div className="space-y-1.5">
-              <Label>Due date</Label>
+              <Label>{t("due_date_label", language)}</Label>
               <Input
                 type="date"
                 value={dueDate}
@@ -941,7 +943,7 @@ function InvoiceFormDialog({
                         onClick={() => removeItem(it.key)}
                         disabled={items.length === 1}
                       >
-                        <X className="size-4" /> Remove
+                        <X className="size-4" /> {t("remove", language)}
                       </Button>
                     </div>
                   </div>
@@ -1048,15 +1050,15 @@ export function InvoicesModule() {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Invoice created",
-        description: "The invoice has been created successfully.",
+        title: t("invoice_created", language),
+        description: t("invoice_created_desc", language),
       });
       setFormOpen(false);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to create invoice. Please try again.",
+        title: t("error_title", language),
+        description: t("invoice_create_error_desc", language),
         variant: "destructive",
       });
     },
@@ -1083,15 +1085,15 @@ export function InvoicesModule() {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Invoice updated",
-        description: "The invoice has been updated successfully.",
+        title: t("invoice_updated", language),
+        description: t("invoice_updated_desc", language),
       });
       setFormOpen(false);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update invoice. Please try again.",
+        title: t("error_title", language),
+        description: t("invoice_update_error_desc", language),
         variant: "destructive",
       });
     },
@@ -1106,8 +1108,8 @@ export function InvoicesModule() {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Invoice deleted",
-        description: "The invoice has been deleted.",
+        title: t("invoice_deleted", language),
+        description: t("invoice_deleted_desc", language),
       });
       setConfirmDelete(null);
       setDetailOpen(false);
@@ -1135,15 +1137,15 @@ export function InvoicesModule() {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Payment recorded",
-        description: "The payment has been recorded successfully.",
+        title: t("payment_recorded", language),
+        description: t("payment_recorded_desc", language),
       });
       setPaymentDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to record payment. Please try again.",
+        title: t("error_title", language),
+        description: t("payment_record_error_desc", language),
         variant: "destructive",
       });
     },
@@ -1276,7 +1278,7 @@ export function InvoicesModule() {
             <SelectItem value="all">{t("all_statuses", language)}</SelectItem>
             {Object.entries(INVOICE_STATUS).map(([key, cfg]) => (
               <SelectItem key={key} value={key}>
-                {cfg.label}
+                {getInvoiceStatusLabel(key, language)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -1464,9 +1466,9 @@ export function InvoicesModule() {
         onOpenChange={(open) => {
           if (!open) setConfirmDelete(null);
         }}
-        title="Delete invoice?"
-        description={`This will permanently delete invoice ${confirmDelete?.number ?? ""} along with all its line items and payments. This action cannot be undone.`}
-        confirmText="Delete"
+        title={t("delete_invoice_title", language)}
+        description={t("delete_invoice_desc", language).replace("{number}", confirmDelete?.number ?? "")}
+        confirmText={t("delete", language)}
         onConfirm={() =>
           confirmDelete && deleteMutation.mutate(confirmDelete.id)
         }

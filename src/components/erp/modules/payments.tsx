@@ -57,6 +57,7 @@ import { useUIStore } from "@/store/ui-store";
 import { t } from "@/lib/translations";
 import {
   PAYMENT_METHOD,
+  getPaymentMethodLabel,
   formatCurrency,
   formatDate,
   type PaymentMethod,
@@ -451,15 +452,15 @@ export function PaymentsModule() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Payment recorded",
-        description: "The payment has been recorded successfully.",
+        title: t("payment_recorded", language),
+        description: t("payment_recorded_desc", language),
       });
       setFormOpen(false);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to record payment. Please try again.",
+        title: t("payment_error", language),
+        description: t("payment_error_desc", language),
         variant: "destructive",
       });
     },
@@ -486,15 +487,15 @@ export function PaymentsModule() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Payment updated",
-        description: "The payment has been updated successfully.",
+        title: t("payment_updated", language),
+        description: t("payment_updated_desc", language),
       });
       setFormOpen(false);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update payment. Please try again.",
+        title: t("payment_error_update", language),
+        description: t("payment_error_update_desc", language),
         variant: "destructive",
       });
     },
@@ -509,8 +510,8 @@ export function PaymentsModule() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: "Payment deleted",
-        description: "The payment has been deleted.",
+        title: t("payment_deleted", language),
+        description: t("payment_deleted_desc", language),
       });
       setConfirmDelete(null);
     },
@@ -569,14 +570,14 @@ export function PaymentsModule() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Payments"
-        description="Track payments received against invoices"
+        title={t("payments_page_title", language)}
+        description={t("payments_page_desc", language)}
         action={
           <Button
             onClick={openCreateForm}
             className="bg-blue-600 text-white hover:bg-blue-700"
           >
-            <Plus className="size-4" /> Record Payment
+            <Plus className="size-4" /> {t("record_payment", language)}
           </Button>
         }
       />
@@ -585,19 +586,19 @@ export function PaymentsModule() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           icon={Banknote}
-          label="Total Received"
+          label={t("total_received", language)}
           value={formatCurrency(stats.totalReceived)}
           accent="from-blue-500 to-sky-600"
         />
         <StatCard
           icon={CalendarDays}
-          label="This Month"
+          label={t("this_month", language)}
           value={formatCurrency(stats.thisMonth)}
           accent="from-blue-500 to-sky-600"
         />
         <StatCard
           icon={Hash}
-          label="Payments Count"
+          label={t("payments_count", language)}
           value={String(stats.count)}
           accent="from-amber-500 to-orange-600"
         />
@@ -608,7 +609,7 @@ export function PaymentsModule() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by invoice number or customer..."
+            placeholder={t("search_payments_placeholder", language)}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -616,13 +617,13 @@ export function PaymentsModule() {
         </div>
         <Select value={methodFilter} onValueChange={setMethodFilter}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All methods" />
+            <SelectValue placeholder={t("all_methods", language)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All methods</SelectItem>
+            <SelectItem value="all">{t("all_methods", language)}</SelectItem>
             {Object.entries(PAYMENT_METHOD).map(([key, cfg]) => (
               <SelectItem key={key} value={key}>
-                {cfg.label}
+                {getPaymentMethodLabel(key, language)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -631,22 +632,22 @@ export function PaymentsModule() {
 
       {/* Table */}
       {isLoading ? (
-        <LoadingState label="Loading payments..." />
+        <LoadingState label={t("loading_payments", language)} />
       ) : filteredPayments.length === 0 ? (
         <EmptyState
           icon={Banknote}
-          title="No payments found"
+          title={t("no_payments_found", language)}
           description={
             search || methodFilter !== "all"
-              ? "Try adjusting your filters to see more results."
-              : "Record your first payment to get started."
+              ? t("try_adjust_filters", language)
+              : t("create_first_payment", language)
           }
           action={
             <Button
               onClick={openCreateForm}
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
-              <Plus className="size-4" /> Record Payment
+              <Plus className="size-4" /> {t("record_payment", language)}
             </Button>
           }
         />
@@ -656,11 +657,11 @@ export function PaymentsModule() {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-card">
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Method</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead>{t("date_label", language)}</TableHead>
+                  <TableHead>{t("invoice_number", language)}</TableHead>
+                  <TableHead>{t("table_customer", language)}</TableHead>
+                  <TableHead>{t("method_label", language)}</TableHead>
+                  <TableHead className="text-right">{t("amount_label", language)}</TableHead>
                   <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -710,14 +711,14 @@ export function PaymentsModule() {
                           <DropdownMenuItem
                             onClick={() => openEditForm(p)}
                           >
-                            <Pencil className="size-4" /> Edit
+                            <Pencil className="size-4" /> {t("edit", language)}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             variant="destructive"
                             onClick={() => setConfirmDelete(p)}
                           >
-                            <Trash2 className="size-4" /> Delete
+                            <Trash2 className="size-4" /> {t("delete", language)}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -761,11 +762,9 @@ export function PaymentsModule() {
         onOpenChange={(open) => {
           if (!open) setConfirmDelete(null);
         }}
-        title="Delete payment?"
-        description={`This will permanently delete the payment of ${formatCurrency(
-          confirmDelete?.amount || 0,
-        )} for invoice ${confirmDelete?.invoice?.number ?? ""}. This action cannot be undone.`}
-        confirmText="Delete"
+        title={t("delete_payment_title", language)}
+        description={`${t("delete_payment_desc", language).replace("{amount}", formatCurrency(confirmDelete?.amount || 0, language))} ${t("this_action_cannot_be_undone", language)}`}
+        confirmText={t("delete", language)}
         onConfirm={() =>
           confirmDelete && deleteMutation.mutate(confirmDelete.id)
         }

@@ -13,6 +13,7 @@ import {
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
+  type DraggableAttributes,
 } from "@dnd-kit/core";
 import {
   Inbox,
@@ -57,6 +58,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   DEAL_STAGE,
   DEAL_STAGE_ORDER,
+  getDealStageLabel,
   formatCurrency,
   timeAgo,
   type DealStage,
@@ -97,8 +99,8 @@ interface DealFormState {
 }
 
 interface DragProps {
-  attributes: Record<string, unknown>;
-  listeners: Record<string, unknown>;
+  attributes: Record<string, unknown> | DraggableAttributes;
+  listeners: Record<string, unknown> | undefined;
   setNodeRef: (el: HTMLElement | null) => void;
 }
 
@@ -323,6 +325,7 @@ function KanbanColumn({
 // ---------- Main Module ----------
 
 export function DealsModule() {
+  const language = useUIStore.getState().language;
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const setModule = useUIStore((s) => s.setModule);
@@ -375,6 +378,26 @@ export function DealsModule() {
       });
       if (!res.ok) throw new Error("Failed to move deal");
       return res.json();
+    },
+    onMutate: async ({ id, stage }) => {
+      await queryClient.cancelQueries({ queryKey: ["deals"] });
+      const prev = queryClient.getQueryData<Deal[]>(["deals"]);
+      queryClient.setQueryData<Deal[]>(["deals"], (old = []) =>
+        old.map((d) => (d.id === id ? { ...d, stage } : d)),
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(["deals"], ctx.prev);
+      toast({
+        title: t("move_failed", language),
+        description: t("move_reverted", language),
+        variant: "destructive",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 
@@ -485,8 +508,8 @@ export function DealsModule() {
   async function handleSubmit() {
     if (!form.title.trim() || !form.customerId) {
       toast({
-        title: "Missing fields",
-        description: "Title and customer are required.",
+        title: t("missing_fields", language),
+        description: t("title_customer_required", language),
         variant: "destructive",
       });
       return;
@@ -498,16 +521,16 @@ export function DealsModule() {
           id: editingDeal.id,
           payload: form,
         });
-        toast({ title: "Deal updated", description: form.title });
+        toast({ title: t("deal_updated", language), description: form.title });
       } else {
         await createMutation.mutateAsync(form);
-        toast({ title: "Deal created", description: form.title });
+        toast({ title: t("deal_created", language), description: form.title });
       }
       queryClient.invalidateQueries({ queryKey: ["deals"] });
       setDialogOpen(false);
     } catch (e) {
       toast({
-        title: "Error",
+        title: t("error_title", language),
         description: (e as Error).message,
         variant: "destructive",
       });
@@ -522,14 +545,14 @@ export function DealsModule() {
     try {
       await deleteMutation.mutateAsync(deleteTarget.id);
       toast({
-        title: "Deal deleted",
+        title: t("deal_deleted", language),
         description: deleteTarget.title,
       });
       queryClient.invalidateQueries({ queryKey: ["deals"] });
       setDeleteTarget(null);
     } catch (e) {
       toast({
-        title: "Error",
+        title: t("error_title", language),
         description: (e as Error).message,
         variant: "destructive",
       });
@@ -563,30 +586,7 @@ export function DealsModule() {
     if (!targetStage || targetStage === deal.stage) return;
 
     // Optimistic move with rollback on error
-    moveMutation.mutate(
-      { id: deal.id, stage: targetStage },
-      {
-        onMutate: async ({ id, stage }) => {
-          await queryClient.cancelQueries({ queryKey: ["deals"] });
-          const prev = queryClient.getQueryData<Deal[]>(["deals"]);
-          queryClient.setQueryData<Deal[]>(["deals"], (old = []) =>
-            old.map((d) => (d.id === id ? { ...d, stage } : d)),
-          );
-          return { prev };
-        },
-        onError: (_e, _v, ctx) => {
-          if (ctx?.prev) queryClient.setQueryData(["deals"], ctx.prev);
-          toast({
-            title: "Move failed",
-            description: "Reverted the change. Please try again.",
-            variant: "destructive",
-          });
-        },
-        onSettled: () => {
-          queryClient.invalidateQueries({ queryKey: ["deals"] });
-        },
-      },
-    );
+    moveMutation.mutate({ id: deal.id, stage: targetStage });
   }
 
   if (isLoading) {
@@ -675,7 +675,7 @@ export function DealsModule() {
       {/* Mobile stage selector */}
       <div className="lg:hidden">
         <Label htmlFor="mobile-stage" className="sr-only">
-          Stage
+          {t("stage_label", useUIStore.getState().language)}
         </Label>
         <Select
           value={mobileStage}
@@ -687,7 +687,7 @@ export function DealsModule() {
           <SelectContent>
             {DEAL_STAGE_ORDER.map((s) => (
               <SelectItem key={s} value={s}>
-                {DEAL_STAGE[s].label} · {dealsByStage[s].length}
+                {getDealStageLabel(s, useUIStore.getState().language)} · {dealsByStage[s].length}
               </SelectItem>
             ))}
           </SelectContent>
@@ -783,7 +783,7 @@ export function DealsModule() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="deal-stage">Stage</Label>
+                <Label htmlFor="deal-stage">{t("stage_label", useUIStore.getState().language)}</Label>
                 <Select
                   value={form.stage}
                   onValueChange={(v) =>
@@ -796,7 +796,7 @@ export function DealsModule() {
                   <SelectContent>
                     {DEAL_STAGE_ORDER.map((s) => (
                       <SelectItem key={s} value={s}>
-                        {DEAL_STAGE[s].label}
+                        {getDealStageLabel(s, useUIStore.getState().language)}
                       </SelectItem>
                     ))}
                   </SelectContent>
