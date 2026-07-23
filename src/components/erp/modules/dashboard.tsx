@@ -362,13 +362,13 @@ export function DashboardModule() {
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                  tick={{ fontSize: 12, fill: "#475569" }}
                   dy={8}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                  tick={{ fontSize: 12, fill: "#475569" }}
                   tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : String(v))}
                   width={45}
                 />
@@ -377,10 +377,10 @@ export function DashboardModule() {
                   contentStyle={{
                     borderRadius: "8px",
                     border: "1px solid var(--border)",
-                    background: "var(--popover)",
-                    color: "var(--foreground)",
+                    background: "#ffffff",
+                    color: "#1e293b",
                     fontSize: "12px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   }}
                 />
                 <Area
@@ -469,7 +469,7 @@ export function DashboardModule() {
                   type="number"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                  tick={{ fontSize: 12, fill: "#475569" }}
                   tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : String(v))}
                 />
                 <YAxis
@@ -477,14 +477,14 @@ export function DashboardModule() {
                   dataKey="stage"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                  tick={{ fontSize: 12, fill: "#475569" }}
                   tickFormatter={(v) =>
                     getDealStageLabel(v, language) || v
                   }
                   width={110}
                 />
                 <Tooltip
-                  cursor={{ fill: "var(--muted)", opacity: 0.5 }}
+                  cursor={{ fill: "#f1f5f9", opacity: 0.5 }}
                   content={<PipelineTooltip />}
                 />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]} fill="#3b82f6" barSize={22} />
