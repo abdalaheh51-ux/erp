@@ -60,6 +60,7 @@ const NAV_GROUPS: NavGroup[] = [
 
 export function Sidebar() {
   const { activeModule, setModule, sidebarOpen, setSidebarOpen, language } = useUIStore();
+  const isRtl = language === "ar";
 
   return (
     <>
@@ -73,8 +74,9 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-sidebar transition-transform duration-200 lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          "fixed inset-y-0 z-50 flex w-64 flex-col border-border bg-sidebar transition-transform duration-200 lg:translate-x-0",
+          isRtl ? "right-0 border-l border-r-0" : "left-0 border-r",
+          sidebarOpen ? "translate-x-0" : isRtl ? "translate-x-full" : "-translate-x-full",
         )}
       >
         {/* Brand */}

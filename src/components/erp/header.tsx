@@ -8,6 +8,7 @@ import { t } from "@/lib/translations";
 
 export function Header() {
   const { setSidebarOpen, activeModule, language, setLanguage } = useUIStore();
+  const isRtl = language === "ar";
 
   const titles: Record<string, string> = {
     dashboard: t("dashboard", language),
@@ -36,10 +37,10 @@ export function Header() {
 
       <div className="ml-auto flex items-center gap-2">
         <div className="relative hidden md:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className={isRtl ? "pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" : "pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"} />
           <Input
             placeholder="Search..."
-            className="h-9 w-56 pl-9 lg:w-64"
+            className={isRtl ? "h-9 w-56 pr-9 lg:w-64" : "h-9 w-56 pl-9 lg:w-64"}
           />
         </div>
 
@@ -55,12 +56,12 @@ export function Header() {
           title={language === "en" ? "عربي" : "English"}
         >
           <Globe className="size-5" />
-          <span className="ml-0.5 text-xs font-semibold">
+          <span className={isRtl ? "mr-0.5 text-xs font-semibold" : "ml-0.5 text-xs font-semibold"}>
             {language.toUpperCase()}
           </span>
         </Button>
 
-        <div className="ml-1 flex h-9 w-9 items-center justify-center rounded-full overflow-hidden border border-border bg-black shadow-sm">
+        <div className={isRtl ? "mr-1 flex h-9 w-9 items-center justify-center rounded-full overflow-hidden border border-border bg-black shadow-sm" : "ml-1 flex h-9 w-9 items-center justify-center rounded-full overflow-hidden border border-border bg-black shadow-sm"}>
           <img src="/logo.jpg" alt="Nexus ERP" className="h-full w-full object-cover" />
         </div>
       </div>
