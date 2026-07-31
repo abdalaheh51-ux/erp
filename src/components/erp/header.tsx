@@ -1,8 +1,6 @@
 "use client";
 
-import { Menu, Moon, Sun, Bell, Search, Globe } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { Menu, Bell, Search, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUIStore } from "@/store/ui-store";
@@ -10,12 +8,6 @@ import { t } from "@/lib/translations";
 
 export function Header() {
   const { setSidebarOpen, activeModule, language, setLanguage } = useUIStore();
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const titles: Record<string, string> = {
     dashboard: t("dashboard", language),
@@ -67,20 +59,6 @@ export function Header() {
             {language.toUpperCase()}
           </span>
         </Button>
-
-        {mounted && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? (
-              <Sun className="size-5" />
-            ) : (
-              <Moon className="size-5" />
-            )}
-          </Button>
-        )}
 
         <div className="ml-1 flex h-9 w-9 items-center justify-center rounded-full overflow-hidden border border-border bg-black shadow-sm">
           <img src="/logo.jpg" alt="Nexus ERP" className="h-full w-full object-cover" />
