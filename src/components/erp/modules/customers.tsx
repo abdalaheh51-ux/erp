@@ -184,12 +184,11 @@ export function CustomersModule() {
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState<{ name?: string }>({});
 
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
   const qc = useQueryClient();
   const { toast } = useToast();
   const customerDetail = useUIStore((s) => s.customerDetail);
   const closeCustomerDetail = useUIStore((s) => s.closeCustomerDetail);
-  const language = useUIStore((s) => s.language);
   const activeCustomerId = customerDetail.customerId;
 
   // Debounce search input

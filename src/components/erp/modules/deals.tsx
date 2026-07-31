@@ -327,11 +327,11 @@ function KanbanColumn({
 // ---------- Main Module ----------
 
 export function DealsModule() {
-  const language = useUIStore.getState().language;
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const setModule = useUIStore((s) => s.setModule);
   const openCustomerDetail = useUIStore((s) => s.openCustomerDetail);
+  const language = useUIStore((s) => s.language);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileStage, setMobileStage] = useState<DealStage>("contact");
@@ -351,8 +351,6 @@ export function DealsModule() {
   );
 
   // Fetch deals
-  const language = useUIStore((s) => s.language);
-
   const { data: deals = [], isLoading } = useQuery<Deal[]>({
     queryKey: ["deals"],
     queryFn: async () => {

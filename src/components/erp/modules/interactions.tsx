@@ -132,7 +132,6 @@ const emptyForm = {
 };
 
 export function InteractionsModule() {
-  const language = useUIStore.getState().language;
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
