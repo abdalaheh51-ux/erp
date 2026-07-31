@@ -463,7 +463,8 @@ export function DashboardModule() {
               <BarChart
                 data={data.pipeline}
                 layout="vertical"
-                margin={{ top: 0, right: 16, left: 8, bottom: 0 }}
+                margin={{ top: 0, right: 20, left: 48, bottom: 0 }}
+                style={{ direction: "ltr" }}
               >
                 <XAxis
                   type="number"
@@ -477,11 +478,11 @@ export function DashboardModule() {
                   dataKey="stage"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: "#475569" }}
+                  tick={{ fontSize: 13, fill: "#cbd5e1", fontWeight: 600 }}
                   tickFormatter={(v) =>
                     getDealStageLabel(v, language) || v
                   }
-                  width={110}
+                  width={190}
                 />
                 <Tooltip
                   cursor={{ fill: "#f1f5f9", opacity: 0.5 }}
