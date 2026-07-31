@@ -266,6 +266,7 @@ function KanbanColumn({
   isMobile?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
+  const language = useUIStore((s) => s.language);
   const cfg = DEAL_STAGE[stage];
   const total = deals.reduce((sum, d) => sum + (d.value || 0), 0);
 
