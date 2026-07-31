@@ -132,6 +132,8 @@ function DealCardView({
   isDragging?: boolean;
   dragProps?: DragProps;
 }) {
+  const language = useUIStore((s) => s.language);
+
   return (
     <div
       ref={dragProps?.setNodeRef}
@@ -205,14 +207,14 @@ function DealCardView({
             Value
           </p>
           <p className="truncate text-base font-bold leading-tight text-foreground">
-            {formatCurrency(deal.value, useUIStore.getState().language)}
+            {formatCurrency(deal.value, language)}
           </p>
         </div>
         <DealStageBadge stage={deal.stage} />
       </div>
 
       <p className="mt-2 text-[11px] text-muted-foreground">
-        {t("updated", useUIStore.getState().language)} {timeAgo(deal.updatedAt)}
+        {t("updated", language)} {timeAgo(deal.updatedAt)}
       </p>
     </div>
   );
@@ -280,11 +282,11 @@ function KanbanColumn({
         <div className="flex min-w-0 items-center gap-2">
           <DealStageBadge stage={stage} />
           <span className="text-xs font-medium text-muted-foreground">
-            {deals.length} {deals.length === 1 ? t("deal_singular", useUIStore.getState().language) : t("deal_plural", useUIStore.getState().language)}
+            {deals.length} {deals.length === 1 ? t("deal_singular", language) : t("deal_plural", language)}
           </span>
         </div>
         <span className="shrink-0 text-xs font-semibold text-foreground">
-          {formatCurrency(total, useUIStore.getState().language)}
+          {formatCurrency(total, language)}
         </span>
       </div>
 
@@ -302,7 +304,7 @@ function KanbanColumn({
             <div>
               <Inbox className="mx-auto size-5 text-muted-foreground/60" />
               <p className="mt-1.5 text-xs text-muted-foreground">
-                {t("drop_deals_here", useUIStore.getState().language)}
+                {t("drop_deals_here", language)}
               </p>
             </div>
           </div>
@@ -349,6 +351,8 @@ export function DealsModule() {
   );
 
   // Fetch deals
+  const language = useUIStore((s) => s.language);
+
   const { data: deals = [], isLoading } = useQuery<Deal[]>({
     queryKey: ["deals"],
     queryFn: async () => {
@@ -593,10 +597,10 @@ export function DealsModule() {
     return (
       <div className="space-y-5">
         <PageHeader
-          title={t("deals", useUIStore.getState().language)}
-          description={t("deals_description", useUIStore.getState().language)}
+          title={t("deals", language)}
+          description={t("deals_description", language)}
         />
-        <LoadingState label={t("loading_deals", useUIStore.getState().language)} />
+        <LoadingState label={t("loading_deals", language)} />
       </div>
     );
   }
@@ -608,19 +612,19 @@ export function DealsModule() {
     accent: string;
   }> = [
     {
-      label: t("open_pipeline", useUIStore.getState().language),
-      value: formatCurrency(stats.open, useUIStore.getState().language),
+      label: t("open_pipeline", language),
+      value: formatCurrency(stats.open, language),
       icon: TrendingUp,
       accent: "from-blue-500 to-sky-600",
     },
     {
-      label: t("won_closed", useUIStore.getState().language),
-      value: formatCurrency(stats.won, useUIStore.getState().language),
+      label: t("won_closed", language),
+      value: formatCurrency(stats.won, language),
       icon: Trophy,
       accent: "from-amber-500 to-orange-600",
     },
     {
-      label: t("total_deals", useUIStore.getState().language),
+      label: t("total_deals", language),
       value: String(stats.count),
       icon: Layers,
       accent: "from-violet-500 to-purple-600",
@@ -630,15 +634,15 @@ export function DealsModule() {
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        title={t("deals", useUIStore.getState().language)}
-        description={t("deals_description", useUIStore.getState().language)}
+        title={t("deals", language)}
+        description={t("deals_description", language)}
         action={
           <Button
             onClick={openCreate}
             className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600"
           >
             <Plus className="size-4" />
-            {t("new_deal", useUIStore.getState().language)}
+            {t("new_deal", language)}
           </Button>
         }
       />
@@ -743,12 +747,12 @@ export function DealsModule() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingDeal ? t("edit_deal", useUIStore.getState().language) : t("new_deal", useUIStore.getState().language)}
+              {editingDeal ? t("edit_deal", language) : t("new_deal", language)}
             </DialogTitle>
             <DialogDescription>
               {editingDeal
-                ? t("update_deal_description", useUIStore.getState().language)
-                : t("create_deal_description", useUIStore.getState().language)}
+                ? t("update_deal_description", language)
+                : t("create_deal_description", language)}
             </DialogDescription>
           </DialogHeader>
 
@@ -763,14 +767,14 @@ export function DealsModule() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, title: e.target.value }))
                 }
-                placeholder={t("deal_title_placeholder", useUIStore.getState().language)}
+                placeholder={t("deal_title_placeholder", language)}
                 autoFocus
               />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="deal-value">{t("value_label", useUIStore.getState().language)}</Label>
+                <Label htmlFor="deal-value">{t("value_label", language)}</Label>
                 <Input
                   id="deal-value"
                   type="number"
@@ -815,12 +819,12 @@ export function DealsModule() {
                 }
               >
                 <SelectTrigger id="deal-customer" className="w-full">
-                  <SelectValue placeholder={t("select_customer", useUIStore.getState().language)} />
+                  <SelectValue placeholder={t("select_customer", language)} />
                 </SelectTrigger>
                 <SelectContent>
                   {customers.length === 0 && (
                     <SelectItem value="__none" disabled>
-                      {t("no_customers_available", useUIStore.getState().language)}
+                      {t("no_customers_available", language)}
                     </SelectItem>
                   )}
                   {customers.map((c) => (
@@ -839,7 +843,7 @@ export function DealsModule() {
               onClick={() => setDialogOpen(false)}
               disabled={submitting}
             >
-              {t("cancel", useUIStore.getState().language)}
+              {t("cancel", language)}
             </Button>
             <Button
               onClick={handleSubmit}
@@ -847,10 +851,10 @@ export function DealsModule() {
               className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600"
             >
               {submitting
-                ? t("saving", useUIStore.getState().language)
+                ? t("saving", language)
                 : editingDeal
-                  ? t("save_changes", useUIStore.getState().language)
-                  : t("create_deal", useUIStore.getState().language)}
+                  ? t("save_changes", language)
+                  : t("create_deal", language)}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -860,13 +864,13 @@ export function DealsModule() {
       <ConfirmDialog
         open={!!deleteTarget}
         onOpenChange={(v) => !v && setDeleteTarget(null)}
-        title={t("delete_deal_title", useUIStore.getState().language)}
+        title={t("delete_deal_title", language)}
         description={
           deleteTarget
-            ? `${deleteTarget.title} ${t("delete_deal_description", useUIStore.getState().language)}`
+            ? `${deleteTarget.title} ${t("delete_deal_description", language)}`
             : ""
         }
-        confirmText={deleting ? t("deleting", useUIStore.getState().language) : t("delete", useUIStore.getState().language)}
+        confirmText={deleting ? t("deleting", language) : t("delete", language)}
         onConfirm={handleDelete}
       />
     </div>

@@ -2,7 +2,7 @@
 
 import { Menu, Moon, Sun, Bell, Search, Globe } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUIStore } from "@/store/ui-store";
@@ -12,6 +12,10 @@ export function Header() {
   const { setSidebarOpen, activeModule, language, setLanguage } = useUIStore();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const titles: Record<string, string> = {
     dashboard: t("dashboard", language),

@@ -139,7 +139,7 @@ function PipelineTooltip({ active, payload }: {
   if (!active || !payload || payload.length === 0) return null;
   const item = payload[0].payload;
   const stageCfg = DEAL_STAGE[item.stage as keyof typeof DEAL_STAGE];
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
   return (
     <div className="rounded-lg border border-border bg-popover px-3 py-2.5 shadow-lg">
       <div className="flex items-center gap-2">
@@ -173,7 +173,7 @@ function InvoiceStatusTooltip({ active, payload }: {
   const item = payload[0].payload;
   const statusCfg = INVOICE_STATUS[item.status as keyof typeof INVOICE_STATUS];
   const color = PIE_COLORS[item.status] || "#a1a1aa";
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
   return (
     <div className="rounded-lg border border-border bg-popover px-3 py-2.5 shadow-lg">
       <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export function DashboardModule() {
     },
   });
   const setModule = useUIStore((s) => s.setModule);
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
 
   if (isLoading || !data) {
     return (

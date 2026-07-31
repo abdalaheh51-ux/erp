@@ -181,7 +181,7 @@ function PaymentFormDialog({
   onSubmit: (data: PaymentFormPayload) => void;
   submitting: boolean;
 }) {
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
   // Lazy initial state — parent remounts this dialog via `key` whenever it
   // is opened, so these initializers run fresh each time.
   const [invoiceId, setInvoiceId] = useState<string>(
@@ -410,7 +410,7 @@ export function PaymentsModule() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { openCustomerDetail, setModule } = useUIStore();
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
 
   const [search, setSearch] = useState("");
   const [methodFilter, setMethodFilter] = useState<string>("all");

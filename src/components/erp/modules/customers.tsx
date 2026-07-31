@@ -189,6 +189,7 @@ export function CustomersModule() {
   const { toast } = useToast();
   const customerDetail = useUIStore((s) => s.customerDetail);
   const closeCustomerDetail = useUIStore((s) => s.closeCustomerDetail);
+  const language = useUIStore((s) => s.language);
   const activeCustomerId = customerDetail.customerId;
 
   // Debounce search input
@@ -242,15 +243,15 @@ export function CustomersModule() {
       qc.invalidateQueries({ queryKey: ["customers"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: t("toast_customer_created_title", useUIStore.getState().language),
-        description: t("toast_customer_created_desc", useUIStore.getState().language),
+        title: t("toast_customer_created_title", language),
+        description: t("toast_customer_created_desc", language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: t("error_something_wrong", useUIStore.getState().language),
-        description: t("error_try_again", useUIStore.getState().language),
+        title: t("error_something_wrong", language),
+        description: t("error_try_again", language),
         variant: "destructive",
       });
     },
@@ -283,15 +284,15 @@ export function CustomersModule() {
       qc.invalidateQueries({ queryKey: ["customer", activeCustomerId] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: t("toast_customer_updated_title", useUIStore.getState().language),
-        description: t("toast_customer_updated_desc", useUIStore.getState().language),
+        title: t("toast_customer_updated_title", language),
+        description: t("toast_customer_updated_desc", language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: t("error_something_wrong", useUIStore.getState().language),
-        description: t("error_try_again", useUIStore.getState().language),
+        title: t("error_something_wrong", language),
+        description: t("error_try_again", language),
         variant: "destructive",
       });
     },
@@ -307,15 +308,15 @@ export function CustomersModule() {
       qc.invalidateQueries({ queryKey: ["customers"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: t("toast_customer_deleted_title", useUIStore.getState().language),
-        description: t("toast_customer_deleted_desc", useUIStore.getState().language),
+        title: t("toast_customer_deleted_title", language),
+        description: t("toast_customer_deleted_desc", language),
       });
       setDeleteTarget(null);
     },
     onError: () => {
       toast({
-        title: t("error_something_wrong", useUIStore.getState().language),
-        description: t("error_try_again", useUIStore.getState().language),
+        title: t("error_something_wrong", language),
+        description: t("error_try_again", language),
         variant: "destructive",
       });
     },
@@ -343,7 +344,7 @@ export function CustomersModule() {
 
   function validate(): boolean {
     const err: { name?: string } = {};
-    if (!form.name.trim()) err.name = t("validation_name_required", useUIStore.getState().language);
+    if (!form.name.trim()) err.name = t("validation_name_required", language);
     setFormError(err);
     return Object.keys(err).length === 0;
   }
@@ -374,15 +375,15 @@ export function CustomersModule() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t("customers", useUIStore.getState().language)}
-        description={t("manage_customers_desc", useUIStore.getState().language)}
+        title={t("customers", language)}
+        description={t("manage_customers_desc", language)}
         action={
           <Button
             onClick={openCreate}
             className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
           >
             <Plus className="size-4" />
-            {t("new_customer", useUIStore.getState().language)}
+            {t("new_customer", language)}
           </Button>
         }
       />
@@ -394,7 +395,7 @@ export function CustomersModule() {
           <Input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder={t("search_customers_placeholder", useUIStore.getState().language)}
+            placeholder={t("search_customers_placeholder", language)}
             className="pl-9"
             aria-label="Search customers"
           />
@@ -404,10 +405,10 @@ export function CustomersModule() {
               className="w-full sm:w-[180px]"
               aria-label="Filter by status"
             >
-              <SelectValue placeholder={t("all_statuses", useUIStore.getState().language)} />
+              <SelectValue placeholder={t("all_statuses", language)} />
             </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t("all_statuses", useUIStore.getState().language)}</SelectItem>
+            <SelectItem value="all">{t("all_statuses", language)}</SelectItem>
             {STATUS_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>
                 {getCustomerStatusLabel(s, language)}
@@ -419,19 +420,19 @@ export function CustomersModule() {
 
       {/* Table / states */}
       {isLoading ? (
-        <LoadingState label={t("loading", useUIStore.getState().language)} />
+        <LoadingState label={t("loading", language)} />
       ) : customers.length === 0 ? (
         <EmptyState
           icon={Users}
           title={
             search || statusFilter !== "all"
-              ? t("no_customers_found", useUIStore.getState().language)
-              : t("no_customers_yet", useUIStore.getState().language)
+              ? t("no_customers_found", language)
+              : t("no_customers_yet", language)
           }
           description={
             search || statusFilter !== "all"
-              ? t("no_customers_found_desc", useUIStore.getState().language)
-              : t("no_customers_yet_desc", useUIStore.getState().language)
+              ? t("no_customers_found_desc", language)
+              : t("no_customers_yet_desc", language)
           }
           action={
             search || statusFilter !== "all" ? (
@@ -442,7 +443,7 @@ export function CustomersModule() {
                   setStatusFilter("all");
                 }}
               >
-                {t("clear_filters", useUIStore.getState().language)}
+                {t("clear_filters", language)}
               </Button>
             ) : (
               <Button
@@ -450,7 +451,7 @@ export function CustomersModule() {
                 className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
               >
                 <Plus className="size-4" />
-                {t("add_customer", useUIStore.getState().language)}
+                {t("add_customer", language)}
               </Button>
             )
           }
@@ -461,13 +462,13 @@ export function CustomersModule() {
             <p className="text-sm text-muted-foreground">
               <span className="font-medium text-foreground">{customers.length}</span>{" "}
               {customers.length === 1
-                ? t("customer_singular", useUIStore.getState().language)
-                : t("customer_plural", useUIStore.getState().language)}
+                ? t("customer_singular", language)
+                : t("customer_plural", language)}
               {totalDeals > 0 && (
                 <>
                   {" · "}
                   <span className="font-medium text-foreground">{totalDeals}</span>{" "}
-                  {t("open_deals", useUIStore.getState().language)} {totalDeals === 1 ? t("deal_singular", useUIStore.getState().language) : t("deal_plural", useUIStore.getState().language)}
+                  {t("open_deals", language)} {totalDeals === 1 ? t("deal_singular", language) : t("deal_plural", language)}
                 </>
               )}
             </p>
@@ -476,12 +477,12 @@ export function CustomersModule() {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-card after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-border">
                 <TableRow className="border-b hover:bg-transparent">
-                  <TableHead className="pl-4">{t("table_customer", useUIStore.getState().language)}</TableHead>
-                  <TableHead>{t("table_contact", useUIStore.getState().language)}</TableHead>
-                  <TableHead>{t("table_status", useUIStore.getState().language)}</TableHead>
-                  <TableHead>{t("table_source", useUIStore.getState().language)}</TableHead>
-                  <TableHead className="text-center">{t("table_deals", useUIStore.getState().language)}</TableHead>
-                  <TableHead>{t("table_created", useUIStore.getState().language)}</TableHead>
+                  <TableHead className="pl-4">{t("table_customer", language)}</TableHead>
+                  <TableHead>{t("table_contact", language)}</TableHead>
+                  <TableHead>{t("table_status", language)}</TableHead>
+                  <TableHead>{t("table_source", language)}</TableHead>
+                  <TableHead className="text-center">{t("table_deals", language)}</TableHead>
+                  <TableHead>{t("table_created", language)}</TableHead>
                   <TableHead className="w-12 pr-4 text-right" />
                 </TableRow>
               </TableHeader>

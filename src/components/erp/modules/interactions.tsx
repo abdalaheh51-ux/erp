@@ -149,6 +149,7 @@ export function InteractionsModule() {
   const { toast } = useToast();
   const openCustomerDetail = useUIStore((s) => s.openCustomerDetail);
   const setModule = useUIStore((s) => s.setModule);
+  const language = useUIStore((s) => s.language);
 
   // Debounce search
   useEffect(() => {
@@ -224,15 +225,15 @@ export function InteractionsModule() {
       qc.invalidateQueries({ queryKey: ["interactions"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: t("interaction_logged_title", useUIStore.getState().language),
-        description: t("interaction_logged_desc", useUIStore.getState().language),
+        title: t("interaction_logged_title", language),
+        description: t("interaction_logged_desc", language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: t("error", useUIStore.getState().language),
-        description: t("error_save_interaction", useUIStore.getState().language),
+        title: t("error", language),
+        description: t("error_save_interaction", language),
         variant: "destructive",
       });
     },
@@ -263,15 +264,15 @@ export function InteractionsModule() {
       qc.invalidateQueries({ queryKey: ["interactions"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: t("interaction_updated_title", useUIStore.getState().language),
-        description: t("interaction_updated_desc", useUIStore.getState().language),
+        title: t("interaction_updated_title", language),
+        description: t("interaction_updated_desc", language),
       });
       setDialogOpen(false);
     },
     onError: () => {
       toast({
-        title: t("error", useUIStore.getState().language),
-        description: t("error_update_interaction", useUIStore.getState().language),
+        title: t("error", language),
+        description: t("error_update_interaction", language),
         variant: "destructive",
       });
     },
@@ -289,15 +290,15 @@ export function InteractionsModule() {
       qc.invalidateQueries({ queryKey: ["interactions"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       toast({
-        title: t("interaction_deleted_title", useUIStore.getState().language),
-        description: t("interaction_deleted_desc", useUIStore.getState().language),
+        title: t("interaction_deleted_title", language),
+        description: t("interaction_deleted_desc", language),
       });
       setDeleteTarget(null);
     },
     onError: () => {
       toast({
-        title: t("error", useUIStore.getState().language),
-        description: t("error_delete_interaction", useUIStore.getState().language),
+        title: t("error", language),
+        description: t("error_delete_interaction", language),
         variant: "destructive",
       });
     },
@@ -328,8 +329,8 @@ export function InteractionsModule() {
 
   function validate(): boolean {
     const err: { customerId?: string; content?: string } = {};
-    if (!form.customerId) err.customerId = t("please_select_customer", useUIStore.getState().language);
-    if (!form.content.trim()) err.content = t("content_required", useUIStore.getState().language);
+    if (!form.customerId) err.customerId = t("please_select_customer", language);
+    if (!form.content.trim()) err.content = t("content_required", language);
     setFormError(err);
     return Object.keys(err).length === 0;
   }
@@ -361,15 +362,15 @@ export function InteractionsModule() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t("activity", useUIStore.getState().language)}
-        description={t("activity_description", useUIStore.getState().language)}
+        title={t("activity", language)}
+        description={t("activity_description", language)}
         action={
           <Button
             onClick={openCreate}
             className="bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600/50"
           >
             <Plus className="size-4" />
-            {t("log_interaction", useUIStore.getState().language)}
+            {t("log_interaction", language)}
           </Button>
         }
       />
@@ -381,20 +382,20 @@ export function InteractionsModule() {
           <Input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder={t("search_interactions_placeholder", useUIStore.getState().language)}
+            placeholder={t("search_interactions_placeholder", language)}
             className="pl-9"
-            aria-label={t("search_interactions_aria", useUIStore.getState().language)}
+            aria-label={t("search_interactions_aria", language)}
           />
         </div>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger
             className="w-full sm:w-[180px]"
-            aria-label={t("filter_by_type_aria", useUIStore.getState().language)}
+            aria-label={t("filter_by_type_aria", language)}
           >
-            <SelectValue placeholder={t("all_types", useUIStore.getState().language)} />
+            <SelectValue placeholder={t("all_types", language)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t("all_types", useUIStore.getState().language)}</SelectItem>
+            <SelectItem value="all">{t("all_types", language)}</SelectItem>
             {TYPE_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>
                 {getInteractionTypeLabel(t, language)}

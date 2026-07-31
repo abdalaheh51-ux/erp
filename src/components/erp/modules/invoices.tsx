@@ -213,7 +213,7 @@ function InvoiceDetailSheet({
   onRecordPayment: () => void;
   onCustomerClick: (id: string) => void;
 }) {
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
   const paid = sumPaid(invoice?.payments);
   const total = invoice?.totalAmount || 0;
   const balance = calculateInvoiceBalance(total, invoice?.payments || []);
@@ -996,7 +996,7 @@ export function InvoicesModule() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { openCustomerDetail, setModule } = useUIStore();
-  const language = useUIStore.getState().language;
+  const language = useUIStore((s) => s.language);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
